@@ -27,6 +27,10 @@
             max-width: 200px;
             max-height: 200px;
         }
+        .img-err-alt{
+            width: 50%;
+  margin: 25%;
+        }
 
 
 
@@ -72,7 +76,7 @@
             
             </div>
             <p></p>
-                <a href="#ui-bottom" class="btn btn-primary" onclick="Img('get')">送出</a>
+                <button class="btn btn-primary" onclick="Img('get')">送出</button>
 
             </div>
 
@@ -144,8 +148,8 @@
 
 var imgCount = 0,activeImg = 0,errorImgArr = [];
         function Img(type, par) {
-            console.log(type)
-            console.log(par)
+            console.log({"type":type,"par":par})
+        
             if (type == 'download' || type == 'dl') {
                 //download img
 
@@ -176,7 +180,7 @@ var imgCount = 0,activeImg = 0,errorImgArr = [];
                 
                 <div class="data-item" id="data-${imgCount}">
                     <div class="d-flex">
-                        <div class="data-image"><img crossOrigin="anonymous" alt='無法取得資料' id='img-${imgCount}' onload="Img('loaded',{'id':'img-${imgCount}','num':${imgCount}})" src=${url} onerror="Img('error',{'id':'img-${imgCount}','num':${imgCount}})"></div>
+                        <div class="data-image" id="img-container-${imgCount}"><img crossOrigin="anonymous" alt='無法取得資料' id='img-${imgCount}' onload="Img('loaded',{'id':'img-${imgCount}','num':${imgCount}})" src=${url} onerror="Img('error',{'id':'img-${imgCount}','num':${imgCount}})"></div>
                         <div style="padding: 5px;">
 
                             <div class="btn-group" role="group" aria-label="toolbar">
@@ -220,8 +224,9 @@ var imgCount = 0,activeImg = 0,errorImgArr = [];
             else if(type == "error"){
                 if(!errorImgArr.includes(par.num)){
                     errorImgArr.push('data-'+par.num)
-                    $('#'+par.id).removeAttr("crossorigin")
-                $('#'+par.id).attr("src","error.png");
+                    $('#'+par.id).remove()
+                $("#img-container-"+par.num).html(`<div class='img-err-alt'><i class="bi bi-x-circle text-danger" style='font-size:2.5em'></i><h6>資料讀取失敗</h6></div>`)
+                $("#data-loading-"+par.num).remove()
                 $("#download-"+par.num).attr("disabled",true)
                 $("#data-from-"+par.num).html("<s style='color:#ff0000'>"+ $("#data-from-"+par.num).html()+"</s><br><span style='color:#ff0000'>資料取得失敗</span>")
             }
