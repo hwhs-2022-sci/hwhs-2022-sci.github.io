@@ -144,7 +144,7 @@ var imgCount = 0,activeImg = 0,errorImgArr = [];
 
             } else if (type == 'delete' || type == 'del') {
                 //delete img
-                PopupAlert({title:'確定刪除圖片?',body:'刪除之後無法復原',escCallBack:'dismiss',enterCallBack:`$('#${par}').remove();activeImg--;removeElementFromArray(errorImgArr,${par});if(activeImg==0){$('#data-display').append('<span id=img-placeholder>已經取得的圖片<wbr>會顯示在這裡</span>')}`})
+                PopupAlert({title:'確定刪除圖片?',body:'刪除之後無法復原',escCallBack:'dismiss',enterCallBack:`$('#${par}').remove();activeImg--;removeElementFromArray(errorImgArr,"${par}");if(activeImg==0){$('#data-display').append('<span id=img-placeholder>已經取得的圖片<wbr>會顯示在這裡</span>')}`})
             }
             else if(type == 'get'){
                 
