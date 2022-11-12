@@ -18,7 +18,7 @@
         }
 
         #data-display {
-            max-height: 450px;
+           
 
             padding: 5px;
             overflow-y: scroll;
@@ -161,7 +161,8 @@
             console.log({ "type": type, "par": par })
 
             if (type == 'download' || type == 'dl') {
-                imageToDataURL($("#"+par.id).attr('src'))
+             let dataurl = imageToDataURL($("#"+par.id).attr('src'));
+
 
             } else if (type == 'delete' || type == 'del') {
 
@@ -204,7 +205,7 @@
                             <br>
                             <span data-from="cwb" id="data-from-${imgCount}">取自:中央氣象局</span>
                             <br>
-                            <span data-fileName="">${date}&nbsp;${$("#time-input").val()}&nbsp;<wbr>${place}</span>
+                            <span id="data-filename-${imgCount}" data-fileName="${date} ${$("#time-input").val()} ${place}">${date}&nbsp;${$("#time-input").val()}&nbsp;<wbr>${place}</span>
                             <br>
                             <div id="data-loading-${imgCount}">
                             <div class="spinner-border text-primary" style="width:1em;height:1em"  role="status"><span class="visually-hidden">Loading...</span></div>
@@ -331,12 +332,12 @@
             // return canvas.toDataURL("image/png", 0.9);
         };
 
-        (async () => {
+        /*(async () => {
             let dataUrl = await imageToDataURL('https://en.wikipedia.org/static/images/project-logos/enwiki.png')
             //wikiImg.src = dataUrl;
             console.log(dataUrl)
         })();
-
+*/
         /*
         var canvas = document.getElementById('myCanvas'),
             ctx= canvas.getContext('2d'); 
