@@ -18,7 +18,7 @@
         }
 
         #data-display {
-           max-height: 450px;
+            max-height: 450px;
 
             padding: 5px;
             overflow-y: scroll;
@@ -44,12 +44,14 @@
             margin-top: 5px;
 
         }
-        .cvs-layer{
-        
+
+        .cvs-layer {
+
             margin-bottom: 5px;
             padding: 5px;
         }
-        .not-allow-delete{
+
+        .not-allow-delete {
             background-color: rgb(211, 211, 211);
         }
 
@@ -107,6 +109,7 @@
 
             </div>
 
+
         </div>
         <div>
             <h2>圖片分析</h2>
@@ -114,14 +117,15 @@
                 <div class="cvs-layer not-allow-delete d-flex">
 
                     <h4>底圖</h4>
-                    <span style="user-select: none;">&nbsp;&nbsp;</span>
-                    <input type="text" class="form-control" list="img-data-list" />
+                    <span style="user-select: none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <input type="number" placeholder="輸入圖片代碼" class="form-control" list="img-data-list" />
                 </div>
                 <div class="cvs-layer d-flex">
 
                     <h4>新增</h4>
                 </div>
             </div>
+            <button class="btn btn-primary">繪製</button>
             <canvas id="canvas" style="border: 1px solid #000;width: 800px;height: 800px;">你的瀏覽器不支援我們使用的技術.</canvas>
             <div><input type="color" id="cvs-color"></div>
         </div>
@@ -130,9 +134,9 @@
     <div id="ui-bottom"></div>
 
     <!--------------------------DataList----------------------------->
-    
+
     <datalist id="img-data-list">
-        <option value="123"></option>
+
     </datalist>
 
 
@@ -188,12 +192,13 @@
 
 
 
-        var imgCount = 0, activeImg = 0, errorImgArr = [], imgNums=[],imgData=[];
+        var imgCount = 0, activeImg = 0, errorImgArr = [], imgNums = [], imgData = [];
         function Img(type, par) {
             console.log({ "type": type, "par": par })
 
             if (type == 'download' || type == 'dl') {
-             let dataurl = imageToDataURL($("#"+par.id).attr('src'));
+
+                download_img({ id: par.id, num: par.num })
 
 
             } else if (type == 'delete' || type == 'del') {
@@ -237,12 +242,14 @@
                             <br>
                             <span data-from="cwb" id="data-from-${imgCount}">取自:中央氣象局</span>
                             <br>
-                            <span id="data-filename-${imgCount}" data-fileName="${date} ${$("#time-input").val()} ${place}">${date}&nbsp;${$("#time-input").val()}&nbsp;<wbr>${place}</span>
+                            <span id="data-filename-${imgCount}" data-fileName="${date}_${$("#time-input").val()}_${place}.png">${date}&nbsp;${$("#time-input").val()}&nbsp;<wbr>${place}</span>
                             <br>
+                            
                             <div id="data-loading-${imgCount}">
                             <div class="spinner-border text-primary spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>
-                           圖片載入中...
-                           </div>
+                            圖片載入中...
+                            </div>
+                            <span class='text-secondary'>#${imgCount}</span>
                         </div>
                     </div>
                 </div>
@@ -250,6 +257,7 @@
                 `)
                         $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
                         imgData.push([])
+                        $("#img-data-list").append(`<option value=${imgCount}>#${imgCount}</option>`)
                     }
                 } else {
                     let html = ''
@@ -371,14 +379,20 @@
             console.log(dataUrl)
         })();
 */
-function drawImg(data,alpha) {//arr
-    var canvas = document.getElementById('canvas'),
-        ctx= canvas.getContext('2d'); 
-    for(let i=0;i<data.length();i++){
-        ctx.globalAlpha  = alpha[i];
-        ctx.drawImage()
-    }
-}
+        async function download_img(par) {
+            let dataurl = await imageToDataURL($("#" + par.id).attr('src')),
+                a = document.createElement("a")
+            a.href = dataurl; a.download = $("#data-filename-" + par.num).attr("data-filename");
+            a.click()
+        }
+        function drawImg(data, alpha) {//arr
+            var canvas = document.getElementById('canvas'),
+                ctx = canvas.getContext('2d');
+            for (let i = 0; i < data.length(); i++) {
+                ctx.globalAlpha = alpha[i];
+                ctx.drawImage()
+            }
+        }
         /*
 
         //ctx.globalAlpha = 0.5
