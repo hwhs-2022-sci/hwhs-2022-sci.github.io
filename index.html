@@ -16,6 +16,12 @@
         .flex {
             display: flex !important;
         }
+        #data-display{
+            max-height: 450px;
+       
+            padding: 5px;
+            overflow-y: scroll;
+        }
 
         .data-image > img{
             max-width: 200px;
@@ -28,6 +34,7 @@
             border: rgb(227, 227, 227) 1px solid;
             box-shadow: rgb(128, 128, 128) 2px 2px 3px;
             margin-top: 5px;
+
         }
         #img-placeholder{
             padding: 15px;
@@ -149,6 +156,11 @@ var imgCount = 0,activeImg = 0,errorImgArr = [];
             else if(type == 'get'){
                 
                 if(!date=='' && !time==''){
+
+                    if(time%5 !== 0){
+                        PopupAlert({'title':'注意','body':'中央氣象局的資料間隔為5分鐘，例:<br>12:00 , 15:50 , 01:25<br>請重新輸入資料','escCallBack':'x','enterCallBack':'dismiss'})
+
+                    }else{
                 imgCount++;activeImg++;
                 let place;
                 //PopupAlert({'title':'正在取得資料...','body':'','escCallback':'dismiss','enterCallback':'console.log(123)'})
@@ -189,6 +201,8 @@ var imgCount = 0,activeImg = 0,errorImgArr = [];
                 </div>
 
                 `)
+                $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight")}, 1000);
+            }
             }else{
                 let html = ''
          
@@ -206,6 +220,7 @@ var imgCount = 0,activeImg = 0,errorImgArr = [];
             else if(type == "error"){
                 if(!errorImgArr.includes(par.num)){
                     errorImgArr.push('data-'+par.num)
+                    $('#'+par.id).removeAttr("crossorigin")
                 $('#'+par.id).attr("src","error.png");
                 $("#download-"+par.num).attr("disabled",true)
                 $("#data-from-"+par.num).html("<s style='color:#ff0000'>"+ $("#data-from-"+par.num).html()+"</s><br><span style='color:#ff0000'>資料取得失敗</span>")
