@@ -190,7 +190,17 @@ var imgCount = 0,activeImg = 0,errorImgArr = [];
 
                 `)
             }else{
-                PopupAlert({title:'請輸入完整資料',body:'請檢查你的輸入<br>所有欄位皆必須填寫',escCallBack:'x',enterCallBack:'dismiss'})
+                let html = ''
+         
+                if(date == undefined){
+                    html = html + `日期:<input type="date" class="form-control " disabled >`
+                }
+                if(time == undefined){
+
+                    html = html + `時間:<input type="time" class="form-control " disabled >`
+                }
+                console.log(html)
+                PopupAlert({title:'請輸入完整資料',body:`請檢查以下資料<p></p><div >${html}</div>`,escCallBack:'x',enterCallBack:'dismiss'})
             }
             }
             else if(type == "error"){
