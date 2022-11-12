@@ -18,7 +18,7 @@
         }
 
         #data-display {
-           
+           max-height: 450px;
 
             padding: 5px;
             overflow-y: scroll;
@@ -37,11 +37,20 @@
 
 
         .data-item,
-        #img-placeholder {
+        #img-placeholder,
+        .cvs-layer {
             border: rgb(227, 227, 227) 1px solid;
             box-shadow: rgb(128, 128, 128) 2px 2px 3px;
             margin-top: 5px;
 
+        }
+        .cvs-layer{
+        
+            margin-bottom: 5px;
+            padding: 5px;
+        }
+        .not-allow-delete{
+            background-color: rgb(211, 211, 211);
         }
 
         #img-placeholder {
@@ -101,12 +110,35 @@
         </div>
         <div>
             <h2>圖片分析</h2>
+            <div id="cvs-imgLayers">
+                <div class="cvs-layer not-allow-delete d-flex">
+
+                    <h4>底圖</h4>
+                    <span style="user-select: none;">&nbsp;&nbsp;</span>
+                    <input type="text" class="form-control" list="img-data-list" />
+                </div>
+                <div class="cvs-layer d-flex">
+
+                    <h4>新增</h4>
+                </div>
+            </div>
             <canvas id="canvas" style="border: 1px solid #000;width: 800px;height: 800px;">你的瀏覽器不支援我們使用的技術.</canvas>
-            <div></div>
+            <div><input type="color" id="cvs-color"></div>
         </div>
     </div>
 
     <div id="ui-bottom"></div>
+
+    <!--------------------------DataList----------------------------->
+    
+    <datalist id="img-data-list">
+        <option value="123"></option>
+    </datalist>
+
+
+
+
+
     <!--------------------------BS.Modal----------------------------->
 
 
@@ -156,7 +188,7 @@
 
 
 
-        var imgCount = 0, activeImg = 0, errorImgArr = [];
+        var imgCount = 0, activeImg = 0, errorImgArr = [], imgNums=[],imgData=[];
         function Img(type, par) {
             console.log({ "type": type, "par": par })
 
@@ -166,7 +198,7 @@
 
             } else if (type == 'delete' || type == 'del') {
 
-                PopupAlert({ title: '確定刪除圖片?', body: '刪除之後無法復原', escCallBack: 'dismiss', enterCallBack: `$('#${par}').remove();activeImg--;removeElementFromArray(errorImgArr,"${par}");if(activeImg==0){$('#data-display').append('<span id=img-placeholder>已經取得的圖片<wbr>會顯示在這裡</span>')}` })
+                PopupAlert({ title: '確定刪除圖片?', body: '刪除之後無法復原', escCallBack: 'dismiss', enterCallBack: `$('#${par.id}').remove();activeImg--;removeElementFromArray(imgNums,"${par.num}");if(activeImg==0){$('#data-display').append('<span id=img-placeholder>已經取得的圖片<wbr>會顯示在這裡</span>')}` })
             }
             else if (type == 'get') {
 
@@ -198,7 +230,7 @@
                                 <button type="button" class="btn btn-primary" id='download-${imgCount}' onclick="Img('dl',{'id':'img-${imgCount}','num':${imgCount}})">
                                     <i class="bi bi-download"></i>
                                 </button>
-                                <button type="button" class="btn btn-danger" onclick="Img('del','data-${imgCount}')">
+                                <button type="button" class="btn btn-danger" onclick="Img('del',{'id':'data-${imgCount}','num':${imgCount}})">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
@@ -208,7 +240,7 @@
                             <span id="data-filename-${imgCount}" data-fileName="${date} ${$("#time-input").val()} ${place}">${date}&nbsp;${$("#time-input").val()}&nbsp;<wbr>${place}</span>
                             <br>
                             <div id="data-loading-${imgCount}">
-                            <div class="spinner-border text-primary" style="width:1em;height:1em"  role="status"><span class="visually-hidden">Loading...</span></div>
+                            <div class="spinner-border text-primary spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>
                            圖片載入中...
                            </div>
                         </div>
@@ -217,6 +249,7 @@
 
                 `)
                         $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
+                        imgData.push([])
                     }
                 } else {
                     let html = ''
@@ -236,10 +269,10 @@
                 if (!errorImgArr.includes(par.num)) {
                     errorImgArr.push('data-' + par.num)
                     $('#' + par.id).remove()
-                    $("#img-container-" + par.num).html(`<div class='img-err-alt'><i class="bi bi-x-circle text-danger" style='font-size:2.5em'></i><h6 style='color:#ff0000'>資料讀取失敗</h6></div>`)
+                    $("#img-container-" + par.num).html(`<div class='img-err-alt'><i class="bi bi-x-circle text-danger" style='font-size:2.5em'></i><h6 class='text-danger'>資料讀取失敗</h6></div>`)
                     $("#data-loading-" + par.num).remove()
                     $("#download-" + par.num).attr("disabled", true)
-                    $("#data-from-" + par.num).html("<s style='color:#ff0000'>" + $("#data-from-" + par.num).html() + "</s><br><span style='color:#ff0000'>資料取得失敗</span>")
+                    $("#data-from-" + par.num).html("<s class='text-danger'>" + $("#data-from-" + par.num).html() + "</s><br><span class='text-danger'>資料取得失敗</span>")
                 }
             }
             else if (type == "loaded") {
@@ -338,12 +371,19 @@
             console.log(dataUrl)
         })();
 */
+function drawImg(data,alpha) {//arr
+    var canvas = document.getElementById('canvas'),
+        ctx= canvas.getContext('2d'); 
+    for(let i=0;i<data.length();i++){
+        ctx.globalAlpha  = alpha[i];
+        ctx.drawImage()
+    }
+}
         /*
-        var canvas = document.getElementById('myCanvas'),
-            ctx= canvas.getContext('2d'); 
+
         //ctx.globalAlpha = 0.5
         function drawImg(data,alpha) {
-            ctx.globalAlpha  = alpha;
+            
         
         }
         */
