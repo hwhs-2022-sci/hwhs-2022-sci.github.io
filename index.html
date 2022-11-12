@@ -152,9 +152,9 @@ var imgCount = 0,activeImg = 0;
                 imgCount++;activeImg++
                 //PopupAlert({'title':'正在取得資料...','body':'','escCallback':'dismiss','enterCallback':'console.log(123)'})
                 if($("#place-input").val() == "N"){
-                    url = `https://cors-anywhere.herokuapp.com/https://swoo.cwb.gov.tw/V2/img/Ovation/swpc_aurora_N_${date}_${time}.jpg`
+                    url = `https://cors-helper.onrender.com/https://swoo.cwb.gov.tw/V2/img/Ovation/swpc_aurora_N_${date}_${time}.jpg`
                 }else{
-                    url = `https://cors-anywhere.herokuapp.com/https://swoo.cwb.gov.tw/V2/img/Ovation/swpc_aurora_S_${date}_${time}.jpg`
+                    url = `https://cors-helper.onrender.com/https://swoo.cwb.gov.tw/V2/img/Ovation/swpc_aurora_S_${date}_${time}.jpg`
                 }
             $("#img-placeholder").remove()
                 $("#data-display").append(`
