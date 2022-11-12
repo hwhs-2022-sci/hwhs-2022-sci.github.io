@@ -16,35 +16,40 @@
         .flex {
             display: flex !important;
         }
-        #data-display{
+
+        #data-display {
             max-height: 450px;
-       
+
             padding: 5px;
             overflow-y: scroll;
         }
 
-        .data-image > img{
+        .data-image>img {
             max-width: 200px;
             max-height: 200px;
         }
-        .img-err-alt{
+
+        .img-err-alt {
             width: 50%;
-  margin: 25%;
+            margin: 25%;
         }
 
 
 
-        .data-item,#img-placeholder {
+        .data-item,
+        #img-placeholder {
             border: rgb(227, 227, 227) 1px solid;
             box-shadow: rgb(128, 128, 128) 2px 2px 3px;
             margin-top: 5px;
 
         }
-        #img-placeholder{
+
+        #img-placeholder {
             padding: 15px;
             display: block;
             margin-top: 15px !important;
         }
+
         .data-image {
             width: 200px;
             height: 200px;
@@ -53,7 +58,9 @@
 
 
         }
-        .form-control,.form-select{
+
+        .form-control,
+        .form-select {
             width: fit-content;
         }
     </style>
@@ -67,15 +74,18 @@
             <div id="data-input">
                 <h2>輸入資料</h2>
                 <div class="d-flex">
-                <input type="date" name="" id="date-input" onchange="date = this.value" class="form-control"><span style="user-select: none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                <input type="time" name="" id="time-input"  class="form-control" onchange="time = this.value.split(':')[0]+this.value.split(':')[1]"><span style="user-select: none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                <select id="place-input" class="form-select">
-                    <option value="N">北極</option>
-                    <option value="S">南極</option>
-                </select>    
-            
-            </div>
-            <p></p>
+                    <input type="date" name="" id="date-input" onchange="date = this.value" class="form-control"><span
+                        style="user-select: none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <input type="time" name="" id="time-input" class="form-control"
+                        onchange="time = this.value.split(':')[0]+this.value.split(':')[1]"><span
+                        style="user-select: none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <select id="place-input" class="form-select">
+                        <option value="N">北極</option>
+                        <option value="S">南極</option>
+                    </select>
+
+                </div>
+                <p></p>
                 <button class="btn btn-primary" onclick="Img('get')">送出</button>
 
             </div>
@@ -85,18 +95,18 @@
             <div id="data-display">
 
                 <span id="img-placeholder">已經取得的圖片<wbr>會顯示在這裡</span>
-               
+
             </div>
 
         </div>
         <div>
             <h2>圖片分析</h2>
-            <canvas id="canvas" style="border: 1px solid #000;">你的瀏覽器不支援我們使用的技術.</canvas>
+            <canvas id="canvas" style="border: 1px solid #000;width: 800px;height: 800px;">你的瀏覽器不支援我們使用的技術.</canvas>
             <div></div>
         </div>
     </div>
 
-<div id="ui-bottom"></div>
+    <div id="ui-bottom"></div>
     <!--------------------------BS.Modal----------------------------->
 
 
@@ -136,47 +146,47 @@
 
 
     <script>
-        var date , time ,url 
+        var date, time, url
 
 
-//https://swoo.cwb.gov.tw/V2/img/Ovation/swpc_aurora_S_2022-11-09_1320.jpg?ts=1668029289002
-//                                                   N  
+        //https://swoo.cwb.gov.tw/V2/img/Ovation/swpc_aurora_S_2022-11-09_1320.jpg?ts=1668029289002
+        //                                                   N  
 
 
 
 
 
-var imgCount = 0,activeImg = 0,errorImgArr = [];
+        var imgCount = 0, activeImg = 0, errorImgArr = [];
         function Img(type, par) {
-            console.log({"type":type,"par":par})
-        
+            console.log({ "type": type, "par": par })
+
             if (type == 'download' || type == 'dl') {
-                //download img
+                imageToDataURL($("#"+par.id).attr('src'))
 
             } else if (type == 'delete' || type == 'del') {
-                //delete img
-                PopupAlert({title:'確定刪除圖片?',body:'刪除之後無法復原',escCallBack:'dismiss',enterCallBack:`$('#${par}').remove();activeImg--;removeElementFromArray(errorImgArr,"${par}");if(activeImg==0){$('#data-display').append('<span id=img-placeholder>已經取得的圖片<wbr>會顯示在這裡</span>')}`})
+
+                PopupAlert({ title: '確定刪除圖片?', body: '刪除之後無法復原', escCallBack: 'dismiss', enterCallBack: `$('#${par}').remove();activeImg--;removeElementFromArray(errorImgArr,"${par}");if(activeImg==0){$('#data-display').append('<span id=img-placeholder>已經取得的圖片<wbr>會顯示在這裡</span>')}` })
             }
-            else if(type == 'get'){
-                
-                if(!date=='' && !time==''){
+            else if (type == 'get') {
 
-                    if(time%5 !== 0){
-                        PopupAlert({'title':'注意','body':'中央氣象局的資料間隔為5分鐘，例:<br>12:00 , 15:50 , 01:25<br>請重新輸入資料','escCallBack':'x','enterCallBack':'dismiss'})
+                if (!date == '' && !time == '') {
 
-                    }else{
-                imgCount++;activeImg++;
-                let place;
-                //PopupAlert({'title':'正在取得資料...','body':'','escCallback':'dismiss','enterCallback':'console.log(123)'})
-                if($("#place-input").val() == "N"){
-                    url = `https://cors-helper.onrender.com/https://swoo.cwb.gov.tw/V2/img/Ovation/swpc_aurora_N_${date}_${time}.jpg`
-                    place='北極'
-                }else{
-                    place='南極'
-                    url = `https://cors-helper.onrender.com/https://swoo.cwb.gov.tw/V2/img/Ovation/swpc_aurora_S_${date}_${time}.jpg`
-                }
-            $("#img-placeholder").remove()
-                $("#data-display").append(`
+                    if (time % 5 !== 0) {
+                        PopupAlert({ 'title': '注意', 'body': '中央氣象局的資料間隔為5分鐘，例:<br>12:00 , 15:50 , 01:25<br>請重新輸入資料', 'escCallBack': 'x', 'enterCallBack': 'dismiss' })
+
+                    } else {
+                        imgCount++; activeImg++;
+                        let place;
+                        //PopupAlert({'title':'正在取得資料...','body':'','escCallback':'dismiss','enterCallback':'console.log(123)'})
+                        if ($("#place-input").val() == "N") {
+                            url = `https://cors-helper.onrender.com/https://swoo.cwb.gov.tw/V2/img/Ovation/swpc_aurora_N_${date}_${time}.jpg`
+                            place = '北極'
+                        } else {
+                            place = '南極'
+                            url = `https://cors-helper.onrender.com/https://swoo.cwb.gov.tw/V2/img/Ovation/swpc_aurora_S_${date}_${time}.jpg`
+                        }
+                        $("#img-placeholder").remove()
+                        $("#data-display").append(`
                 
                 <div class="data-item" id="data-${imgCount}">
                     <div class="d-flex">
@@ -184,7 +194,7 @@ var imgCount = 0,activeImg = 0,errorImgArr = [];
                         <div style="padding: 5px;">
 
                             <div class="btn-group" role="group" aria-label="toolbar">
-                                <button type="button" class="btn btn-primary" id='download-${imgCount}' onclick="Img()">
+                                <button type="button" class="btn btn-primary" id='download-${imgCount}' onclick="Img('dl',{'id':'img-${imgCount}','num':${imgCount}})">
                                     <i class="bi bi-download"></i>
                                 </button>
                                 <button type="button" class="btn btn-danger" onclick="Img('del','data-${imgCount}')">
@@ -205,51 +215,51 @@ var imgCount = 0,activeImg = 0,errorImgArr = [];
                 </div>
 
                 `)
-                $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight")}, 1000);
-            }
-            }else{
-                let html = ''
-         
-                if(date == undefined){
-                    html = html + `日期:<input type="date" class="form-control " disabled >`
-                }
-                if(time == undefined){
+                        $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
+                    }
+                } else {
+                    let html = ''
 
-                    html = html + `時間:<input type="time" class="form-control " disabled >`
+                    if (date == undefined) {
+                        html = html + `日期:<input type="date" class="form-control " disabled >`
+                    }
+                    if (time == undefined) {
+
+                        html = html + `時間:<input type="time" class="form-control " disabled >`
+                    }
+                    console.log(html)
+                    PopupAlert({ title: '請輸入完整資料', body: `請檢查以下資料<p></p><div >${html}</div>`, escCallBack: 'x', enterCallBack: 'dismiss' })
                 }
-                console.log(html)
-                PopupAlert({title:'請輸入完整資料',body:`請檢查以下資料<p></p><div >${html}</div>`,escCallBack:'x',enterCallBack:'dismiss'})
             }
+            else if (type == "error") {
+                if (!errorImgArr.includes(par.num)) {
+                    errorImgArr.push('data-' + par.num)
+                    $('#' + par.id).remove()
+                    $("#img-container-" + par.num).html(`<div class='img-err-alt'><i class="bi bi-x-circle text-danger" style='font-size:2.5em'></i><h6 style='color:#ff0000'>資料讀取失敗</h6></div>`)
+                    $("#data-loading-" + par.num).remove()
+                    $("#download-" + par.num).attr("disabled", true)
+                    $("#data-from-" + par.num).html("<s style='color:#ff0000'>" + $("#data-from-" + par.num).html() + "</s><br><span style='color:#ff0000'>資料取得失敗</span>")
+                }
             }
-            else if(type == "error"){
-                if(!errorImgArr.includes(par.num)){
-                    errorImgArr.push('data-'+par.num)
-                    $('#'+par.id).remove()
-                $("#img-container-"+par.num).html(`<div class='img-err-alt'><i class="bi bi-x-circle text-danger" style='font-size:2.5em'></i><h6>資料讀取失敗</h6></div>`)
-                $("#data-loading-"+par.num).remove()
-                $("#download-"+par.num).attr("disabled",true)
-                $("#data-from-"+par.num).html("<s style='color:#ff0000'>"+ $("#data-from-"+par.num).html()+"</s><br><span style='color:#ff0000'>資料取得失敗</span>")
-            }
-        }
-            else if(type == "loaded"){
-                $("#data-loading-"+par.num).remove()
+            else if (type == "loaded") {
+                $("#data-loading-" + par.num).remove()
             }
         }
 
         //  {title, body, escCallBack, enterCallBack, closeButtonStatue}
-       function removeElementFromArray(arr,ele){
+        function removeElementFromArray(arr, ele) {
 
-        console.log(arr);
+            console.log(arr);
 
-let index = arr.indexOf(ele);
-if (index > -1) { // only splice array when item is found
-  arr.splice(index, 1); // 2nd parameter means remove one item only
-}
+            let index = arr.indexOf(ele);
+            if (index > -1) { // only splice array when item is found
+                arr.splice(index, 1); // 2nd parameter means remove one item only
+            }
 
-// array = [2, 9]
-console.log(arr); 
-return arr
-       }
+            // array = [2, 9]
+            console.log(arr);
+            return arr
+        }
         function PopupAlert(par) {
             console.log(par)
             let _Modal = new bootstrap.Modal(document.getElementById('Modal'));
@@ -271,11 +281,11 @@ return arr
 
             if (par.escCallBack == 'dismiss') {/**/ }
             else if (par.escCallBack == 'x') { $('#modal-esc-button').hide(); }
-            else {$('#modal-esc-button').attr('onclick', par.escCallBack); }
+            else { $('#modal-esc-button').attr('onclick', par.escCallBack); }
 
             if (par.enterCallBack == 'dismiss') {/**/ }
             else if (par.enterCallBack == 'x') { $('#modal-enter-button').hide(); }
-            else {$('#modal-enter-button').attr('onclick', par.enterCallBack);}
+            else { $('#modal-enter-button').attr('onclick', par.enterCallBack); }
 
 
 
@@ -306,45 +316,48 @@ return arr
 
 
         //////**********************************//////
- /*       async function imageToDataURL(imageUrl) {
-  let img = await fetch(imageUrl);
-  img = await img.blob();
-  let bitmap = await createImageBitmap(img);
-  let canvas = document.createElement("canvas");
-  let ctx = canvas.getContext("2d");
-  canvas.width = bitmap.width;
-  canvas.height = bitmap.height;
-  ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height);
-  return canvas.toDataURL("image/png");
-  // image compression? 
-  // return canvas.toDataURL("image/png", 0.9);
-};
+        async function imageToDataURL(imageUrl) {
+            let img = await fetch(imageUrl);
+            img = await img.blob();
+            let bitmap = await createImageBitmap(img);
+            let canvas = document.createElement("canvas");
+            let ctx = canvas.getContext("2d");
+            canvas.width = bitmap.width;
+            canvas.height = bitmap.height;
+            ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height);
+            console.log(canvas.toDataURL("image/png"))
+            return canvas.toDataURL("image/png");
+            // image compression? 
+            // return canvas.toDataURL("image/png", 0.9);
+        };
 
-(async() => {
-  let dataUrl = await imageToDataURL('https://en.wikipedia.org/static/images/project-logos/enwiki.png')
-  wikiImg.src = dataUrl;
-  console.log(dataUrl)
-})();
+        (async () => {
+            let dataUrl = await imageToDataURL('https://en.wikipedia.org/static/images/project-logos/enwiki.png')
+            //wikiImg.src = dataUrl;
+            console.log(dataUrl)
+        })();
+
+        /*
+        var canvas = document.getElementById('myCanvas'),
+            ctx= canvas.getContext('2d'); 
+        //ctx.globalAlpha = 0.5
+        function drawImg(data,alpha) {
+            ctx.globalAlpha  = alpha;
+        
+        }
+        */
 
 
-var canvas = document.getElementById('myCanvas'),
-    ctx= canvas.getContext('2d'); 
-//ctx.globalAlpha = 0.5
-function drawImg(data,alpha) {
-    ctx.globalAlpha  = alpha;
 
-}
+        /* var img     = //new Image();
+         img.onload  = function() {
+             c.drawImage(img, 0, 0);
+         }
+         img.src     = 'image.jpg';
+     */
 
 
-
-    */
-    
-   /* var img     = //new Image();
-    img.onload  = function() {
-        c.drawImage(img, 0, 0);
-    }
-    img.src     = 'image.jpg';
-*/
     </script>
 </body>
+
 </html>
