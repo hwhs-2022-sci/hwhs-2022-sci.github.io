@@ -20,13 +20,14 @@
         #data-display {
             max-height: 450px;
 
+            width: 99%;
             padding: 5px;
             overflow-y: scroll;
         }
 
         .data-image>img {
-            max-width: 200px;
-            max-height: 200px;
+            max-width: 10%;
+            max-height: 10%;
         }
 
         .img-err-alt {
@@ -59,32 +60,33 @@
             padding: 15px;
             display: block;
             margin-top: 15px !important;
+            width: 100%;
         }
 
-        .data-image {
+        /*.data-image {
             width: 200px;
             height: 200px;
             border: rgb(227, 227, 227) 1px solid;
             text-align: center;
 
 
-        }
+        }*/
 
         .form-control,
         .form-select {
-            width:fit-content;
+            width: fit-content;
         }
     </style>
 </head>
 
 <body>
 
-    <div id="app" style="padding: 20px;" class="d-flex">
+    <div id="app" style="padding: 20px;" >
 
-        <div style="width: 50%;padding-right: 25px;">
+        <div style="padding-right: 25px;">
             <div id="data-input">
                 <h2>輸入資料</h2>
-                <div class="d-flex">
+                <div>
                     <input type="date" name="" id="date-input" onchange="date = this.value" class="form-control"><span
                         style="user-select: none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     <input type="time" name="" id="time-input" class="form-control"
@@ -121,7 +123,9 @@
                     <select id="img-data-list-1" class="form-select img-data-list">
                         <option value="0" class="cvs-select-0">請選擇圖片</option>
                     </select>
-                    <input type="number" placeholder="透明度" id="" min="0" max="100" class="form-control">
+                    透明度:
+
+                    <input type="range" max="100" min="0" value="0" />
                 </div>
             </div>
             <div class="cvs-layer d-flex" id="cvs-layer-add" onclick="Canvas('addLayer')">
@@ -425,29 +429,8 @@
          img.src     = 'image.jpg';
      */
 
-     window.onerror = (sMessage, sUrl, sLine)=>{
 
-        PopupAlert({title:"系統錯誤",body:`
-        <h1 class="text-primary">: (</h1>
-        <span class="text-secondary">很抱歉，發生未知的錯誤<br>請刷新頁面，再試一次</span>
-        <p></p>
-        <div class="accordion">
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"  aria-expanded="false">
-                詳細資料
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse " data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                錯誤類型: ${sMessage.split(":")[0]}<p></p>錯誤訊息: ${sMessage.split(":")[1]}<p></p>錯誤來源: index.html:${sLine}:1
-                </div>
-            </div>
-            </div>
-        </div>`,enterCallBack:"dismiss",escCallBack:"x"})
-     }
     </script>
 </body>
-
 
 </html>
