@@ -114,13 +114,15 @@
         <div>
             <h2>圖片分析</h2>
             <div id="cvs-imgLayers">
-                <div class="cvs-layer not-allow-delete d-flex">
+                <div class="cvs-layer not-allow-delete d-flex" data-num="0">
 
                     <h4>底圖</h4>
                     <span style="user-select: none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                    <input type="number" placeholder="輸入圖片代碼" class="form-control" list="img-data-list" />
+                    <select id="img-data-list-1" class="form-select">
+                        <option value="0" class="cvs-select-0">請選擇圖片</option>
+                    </select>
                 </div>
-                <div class="cvs-layer d-flex">
+                <div class="cvs-layer d-flex" id="cvs-layer-add" onclick="Canvas('addLayer')">
 
                     <h4>新增</h4>
                 </div>
@@ -132,14 +134,6 @@
     </div>
 
     <div id="ui-bottom"></div>
-
-    <!--------------------------DataList----------------------------->
-
-    <datalist id="img-data-list">
-
-    </datalist>
-
-
 
 
 
@@ -203,7 +197,7 @@
 
             } else if (type == 'delete' || type == 'del') {
 
-                PopupAlert({ title: '確定刪除圖片?', body: '刪除之後無法復原', escCallBack: 'dismiss', enterCallBack: `$('#${par.id}').remove();activeImg--;removeElementFromArray(imgNums,"${par.num}");if(activeImg==0){$('#data-display').append('<span id=img-placeholder>已經取得的圖片<wbr>會顯示在這裡</span>')}` })
+                PopupAlert({ title: '確定刪除圖片?', body: '刪除之後無法復原', escCallBack: 'dismiss', enterCallBack: `$('#${par.id}').remove();$('.cvs-select-${par.num}').remove();activeImg--;removeElementFromArray(imgNums,"${par.num}");if(activeImg==0){$('#data-display').append('<span id=img-placeholder>已經取得的圖片<wbr>會顯示在這裡</span>')}` })
             }
             else if (type == 'get') {
 
@@ -256,8 +250,8 @@
 
                 `)
                         $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
-                        imgData.push([])
-                        $("#img-data-list").append(`<option value=${imgCount}>#${imgCount}</option>`)
+                    //    imgData.push([])
+                        $("#img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
                     }
                 } else {
                     let html = ''
@@ -288,6 +282,23 @@
             }
         }
 
+
+        var layerCount = 1;
+        function Canvas(type,par) {
+            layerCount++
+            if(type == 'addLayer'){
+                $("#cvs-layer-add").before(`
+                <div class="cvs-layer d-flex" data-num="0">
+                    <h4>第${layerCount}層</h4>
+                    <span style="user-select: none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <select id="img-data-list-1" class="form-select">
+                        <option value="0" class="cvs-select-0">請選擇圖片</option>
+                    </select>
+                </div>
+
+                `)
+            }
+        }
         //  {title, body, escCallBack, enterCallBack, closeButtonStatue}
         function removeElementFromArray(arr, ele) {
 
