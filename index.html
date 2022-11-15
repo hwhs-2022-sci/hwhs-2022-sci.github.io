@@ -479,12 +479,13 @@
          }
          img.src     = 'image.jpg';
      */
-
+/*
         window.onload = ()=>{
             $.ajax({
                 url:"https://cors-helper.onrender.com/test",
                 method:"GET",
                 dataType:"json",
+                crossDomain:true,
                 success:function(re){
                     console.log(re)
                     $("#cors-status").attr("class","text-success").text("連線成功")
@@ -519,6 +520,7 @@
                 }
             })
         }
+        */
 
         window.onerror = (sMessage, sUrl, sLine) => {
 
