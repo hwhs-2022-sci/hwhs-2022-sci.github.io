@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="UTF-8">
@@ -20,14 +20,13 @@
         #data-display {
             max-height: 450px;
 
-            width: 99%;
             padding: 5px;
             overflow-y: scroll;
         }
 
         .data-image>img {
-            max-width: 10%;
-            max-height: 10%;
+            max-width: 200px;
+            max-height: 200px;
         }
 
         .img-err-alt {
@@ -51,6 +50,19 @@
             margin-bottom: 5px;
             padding: 5px;
         }
+        #ui-bottom{
+            position: fixed;
+            bottom: 0;
+            display: flex;
+            background-color: rgb(196, 210, 249);
+            width: 100%;
+            padding: 1px;
+        }
+
+        .cvs-layer>span,
+        .cvs-layer>h4 {
+            margin-top: 1%;
+        }
 
         .not-allow-delete {
             background-color: rgb(211, 211, 211);
@@ -60,17 +72,16 @@
             padding: 15px;
             display: block;
             margin-top: 15px !important;
-            width: 100%;
         }
 
-        /*.data-image {
+        .data-image {
             width: 200px;
             height: 200px;
             border: rgb(227, 227, 227) 1px solid;
             text-align: center;
 
 
-        }*/
+        }
 
         .form-control,
         .form-select {
@@ -81,12 +92,12 @@
 
 <body>
 
-    <div id="app" style="padding: 20px;" >
+    <div id="app" style="padding: 20px;">
 
-        <div style="padding-right: 25px;">
+        <div style=" width:100%;padding-right: 25px;">
             <div id="data-input">
                 <h2>輸入資料</h2>
-                <div>
+                <div class="d-flex">
                     <input type="date" name="" id="date-input" onchange="date = this.value" class="form-control"><span
                         style="user-select: none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     <input type="time" name="" id="time-input" class="form-control"
@@ -115,30 +126,35 @@
         </div>
         <div>
             <h2>圖片分析</h2>
-            <div id="cvs-imgLayers">
+            <div id="cvs-imgLayers" data-count="1">
                 <div class="cvs-layer not-allow-delete d-flex" data-num="0">
 
                     <h4>底圖</h4>
                     <span style="user-select: none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                    <select id="img-data-list-1" class="form-select img-data-list">
+                    <select id="img-data-list-0" class="form-select img-data-list">
                         <option value="0" class="cvs-select-0">請選擇圖片</option>
                     </select>
-                    透明度:
-
-                    <input type="range" max="100" min="0" value="0" />
+                    <span>&nbsp; 透明度:</span><input type="number" placeholder="透明" value="0" min="0" max="100"
+                        id="img-data-input-0" class="form-control"><span>%</span>
                 </div>
             </div>
             <div class="cvs-layer d-flex" id="cvs-layer-add" onclick="Canvas('addLayer')">
 
                 <h4>新增</h4>
             </div>
-            <button class="btn btn-primary">繪製</button>
-            <canvas id="canvas" style="border: 1px solid #000;width: 800px;height: 800px;">你的瀏覽器不支援我們使用的技術.</canvas>
-            <div><input type="color" id="cvs-color"></div>
+            <button class="btn btn-primary" onclick="Canvas('draw')">繪製</button>
+            <canvas id="canvas" style="border: 1px solid #000;width: 660px;height: 660px;">你的瀏覽器不支援我們使用的技術.</canvas>
+          
         </div>
     </div>
 
-    <div id="ui-bottom"></div>
+    <div id="ui-bottom">
+        <span>資料來源:中央氣象局</span>
+        <span style="user-select: none;">&nbsp;&nbsp;</span>
+        
+        <span style="user-select: none;">&nbsp;&nbsp;</span>
+        <span style="float: right;position: absolute; right: 0;">By Jerry 2022-11 v1.0</span>
+            </div>
 
 
 
@@ -257,7 +273,8 @@
                         $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
                         //    imgData.push([])
                         $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
-                        
+
+                       
                     }
                 } else {
                     let html = ''
@@ -276,34 +293,86 @@
             else if (type == "error") {
                 if (!errorImgArr.includes(par.num)) {
                     errorImgArr.push('data-' + par.num)
-                    $('#' + par.id).remove()
+                    $('#' + par.id).remove();
+              //      $('.cvs-select-' + par.num).remove()
                     $("#img-container-" + par.num).html(`<div class='img-err-alt'><i class="bi bi-x-circle text-danger" style='font-size:2.5em'></i><h6 class='text-danger'>資料讀取失敗</h6></div>`)
                     $("#data-loading-" + par.num).remove()
                     $("#download-" + par.num).attr("disabled", true)
-                    $("#data-from-" + par.num).html("<s class='text-danger'>" + $("#data-from-" + par.num).html() + "</s><br><span class='text-danger'>資料取得失敗</span>")
+                    $("#data-from-" + par.num).html("<s class='text-danger'>" + $("#data-from-" + par.num).html() + "</s><br><span class='text-danger'>資料取得失敗<br><a class='link-danger' onclick=Img('help') href='#'>我該怎麼做?</span>")
                 }
             }
             else if (type == "loaded") {
                 $("#data-loading-" + par.num).remove()
             }
+            else if (type == 'help') {
+
+                PopupAlert({
+                    title: "排除圖片載入問題", body: `
+                <ol>
+                    <li>檢查輸入的數據</li>
+                    <li>檢查網路連線</li>
+                    <li>等一下再嘗試</li>
+                </ol>
+                `, enterCallBack: "dismiss", escCallBack: "x"
+                })
+            }
         }
 
 
-        var layerCount = 1;
+        var layerCount = 0;
         function Canvas(type, par) {
-            layerCount++
+
             if (type == 'addLayer') {
+                layerCount++
+                $("#cvs-imgLayers").attr("data-count", layerCount + 1)
                 $("#cvs-imgLayers").append(`
-                <li class="cvs-layer d-flex" data-num="${layerCount}">
+         
+                <div class="cvs-layer d-flex" data-num="${layerCount}">
+
                     <h4>第${layerCount}層</h4>
                     <span style="user-select: none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     <select id="img-data-list-${layerCount}" class="form-select img-data-list">
                         <option value="0" class="cvs-select-0">請選擇圖片</option>
                     </select>
-                </li>
+                    <span>&nbsp; 透明度:</span>
+                    <input type="number" placeholder="透明" value="50" min="0" max="100" id="img-data-input-${layerCount}" class="form-control"><span>%</span>
+                </div>
+        
 
                 `)
-                $(`#img-data-list-${layerCount}`).html($("#img-data-list-1").html())
+                $(`#img-data-list-${layerCount}`).html($("#img-data-list-0").html())
+             
+               // $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
+            }
+            else if (type == 'draw') {
+
+                //先判斷有沒有 沒輸入的
+               /* for (i = 0; i < Math.floor($("#cvs-imgLayers").attr("data-count")); i++) {
+                    if ($("#img-data-input-" + i).val() == '0' || $("#img-data-list-" + i).val() == '') {
+
+                        console.log(i)
+                        PopupAlert({
+                            title:"請輸入完整資料",
+                            body:"請輸入完整資料，或刪除未使用的圖層<br>(如果無法選擇圖片，請先輸入圖片資料)",
+                            enterCallBack:'$("#date-input").focus()',
+                            escCallBack:'x'
+                        })
+                        return;
+                    }
+                }*/
+
+
+
+                let alpha = [], img = [];
+
+                for (i = 0; i < Math.floor($("#cvs-imgLayers").attr("data-count")); i++) {
+                    alpha.push($("#img-data-input-" + i).val())
+                    img.push($("#img-data-list-" + i).val())
+                }
+                //    console.log(img)
+                //    console.log(alpha)
+                drawImg(img, alpha)
+                //    drawImg(par.data,par.alpha);
             }
         }
         //  {title, body, escCallBack, enterCallBack, closeButtonStatue}
@@ -363,20 +432,9 @@
 
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
         //////**********************************//////
         async function imageToDataURL(imageUrl) {
+            console.log(imageUrl)
             let img = await fetch(imageUrl);
             img = await img.blob();
             let bitmap = await createImageBitmap(img);
@@ -391,34 +449,48 @@
             // return canvas.toDataURL("image/png", 0.9);
         };
 
-        /*(async () => {
-            let dataUrl = await imageToDataURL('https://en.wikipedia.org/static/images/project-logos/enwiki.png')
-            //wikiImg.src = dataUrl;
-            console.log(dataUrl)
-        })();
-*/
         async function download_img(par) {
             let dataurl = await imageToDataURL($("#" + par.id).attr('src')),
                 a = document.createElement("a")
             a.href = dataurl; a.download = $("#data-filename-" + par.num).attr("data-filename");
             a.click()
         }
-        function drawImg(data, alpha) {//arr
+        async function drawImg(data, alpha) {//arr
             var canvas = document.getElementById('canvas'),
                 ctx = canvas.getContext('2d');
-            for (let i = 0; i < data.length(); i++) {
-                ctx.globalAlpha = alpha[i];
-                ctx.drawImage()
+            console.log(data);
+            let data_url = []
+            for (let i = 0; i < data.length; i++) {
+                console.log(data[i])
+                //ctx.globalAlpha = alpha[i];
+                data_url.push(await imageToDataURL($("#img-" + data[i]).attr('src')))
+
+            }
+            console.log(data_url)
+            for (let i=0;i<data_url.length;i++){
+   
+      
+            
+
+                let img = new Image  
+
+await new Promise(r => img.onload=r, img.src=data_url[i]);
+ctx.globalAlpha = (10-(alpha[i]/10))/10;
+console.log((10-(alpha[i]/10))/10)
+ctx.drawImage(img,0,0,200,100)
+
+                console.log("done") 
             }
         }
-        /*
 
-        //ctx.globalAlpha = 0.5
-        function drawImg(data,alpha) {
-            
+        /*
         
-        }
-        */
+                //ctx.globalAlpha = 0.5
+                function drawImg(data,alpha) {
+                    
+                
+                }
+                */
 
 
 
@@ -428,9 +500,74 @@
          }
          img.src     = 'image.jpg';
      */
+/*
+        window.onload = ()=>{
+            $.ajax({
+                url:"https://cors-helper.onrender.com/test",
+                method:"GET",
+                dataType:"json",
+                crossDomain:true,
+                success:function(re){
+                    console.log(re)
+                    $("#cors-status").attr("class","text-success").text("連線成功")
+                },
+                error:function(re){
+            $("#cors-status").attr("class","text-danger").text("連線失敗")
+                    PopupAlert({
+                        title:"連接到代理伺服器時發生錯誤",
+                        body:`
+                        <h1 class="text-primary">: (</h1>
+        <span class="text-secondary">目前無法連接至代理伺服器(cors-helper.onrender.com)<br>你可能無法獲取圖片</span>
+        <p></p>
+        <div class="accordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"  aria-expanded="false">
+                可能原因
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse " data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                <ol>
+                    <li>沒有網路連線或連線品質不佳</li>    
+                    <li>伺服器發生故障</li>
+                    
+                </ol>
+                </div>
+            </div>
+            </div>
+        </div>`
+                    })
+                }
+            })
+        }
+        */
 
+        window.onerror = (sMessage, sUrl, sLine) => {
 
+            PopupAlert({
+                title: "系統錯誤", body: `
+        <h1 class="text-primary">: (</h1>
+        <span class="text-secondary">很抱歉，發生未知的錯誤<br>請刷新頁面，再試一次</span>
+        <p></p>
+        <div class="accordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"  aria-expanded="false">
+                詳細資料
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse " data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                錯誤類型: ${sMessage.split(":")[0]}<p></p>錯誤訊息: ${sMessage.split(":")[1]}<p></p>錯誤來源: index.html:${sLine}:1
+                </div>
+            </div>
+            </div>
+        </div>`, enterCallBack: "dismiss", escCallBack: "x"
+            })
+        }
     </script>
 </body>
+
 
 </html>
