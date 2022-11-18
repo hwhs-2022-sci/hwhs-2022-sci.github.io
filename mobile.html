@@ -81,7 +81,12 @@
             text-align: center;
 
 
-       }
+        }
+
+        .form-control,
+        .form-select {
+            width: fit-content;
+        }
     </style>
 </head>
 
@@ -92,7 +97,7 @@
         <div style=" width:100%;padding-right: 25px;">
             <div id="data-input">
                 <h2>輸入資料</h2>
-                <div>
+                <div class="d-flex">
                     <input type="date" name="" id="date-input" onchange="date = this.value" class="form-control"><span
                         style="user-select: none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     <input type="time" name="" id="time-input" class="form-control"
