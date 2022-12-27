@@ -239,8 +239,8 @@
             return check;
         };
         if (window.mobileAndTabletCheck()) {
-             location.href = "/mobile.html"
-         }
+            location.href = "/mobile.html"
+        }
 
 
 
@@ -478,6 +478,8 @@
                 } else {
                     alert("請先選擇圖片")
                 }
+                // Use discardActiveObject to remove the selection border
+                _Canvas.discardActiveObject().renderAll();
             }
         }
         //  {title, body, escCallBack, enterCallBack, closeButtonStatue}
@@ -573,7 +575,8 @@
 
                 var img_element = document.querySelector("#img-" + data[i]),
                     img_draw = new fabric.Image(img_element, {
-
+                        lockMovementX : true,
+                        lockMovementY : true,
                         inverted: true,
                         opacity: (Math.abs(1 - alpha[i] / 100))
                     });
