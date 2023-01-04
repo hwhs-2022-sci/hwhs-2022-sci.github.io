@@ -149,6 +149,21 @@
                 <button class="btn btn-primary" onclick="Canvas('flip')">翻轉</button>
                 <span style="user-select: none;">&nbsp;&nbsp;</span>
                 <button class="btn btn-danger" onclick="Canvas('clear')">清除</button>
+
+               <!-- <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" checked id="flexSwitchCheckDefault"
+                    onblur="
+                    var allobj = _Canvas.getObjects(),
+                        objGroup = new fabric.ActiveSelection(allobj, {
+                            canvas: _Canvas
+                        });
+                        objGroup.forEachObject(function (o) {
+                            o.lockMovementX = this.checked?true:false
+                            o.lockMovementY = this.checked?true:false
+                        });
+                    ">
+                    <label class="form-check-label" for="flexSwitchCheckDefault">鎖定移動</label>
+                </div>-->
             </div>
 
             <p></p>
@@ -446,7 +461,13 @@
                 //    drawImg(par.data,par.alpha);
             }
             else if (type == "flip") {
-                _Canvas.getActiveObject().set("angle", "-180").set("flipY", true).set("top", 800).set("left", 800)//set("angle", "-180").set('flipY', true);
+                console.log()
+                if(!_Canvas.getActiveObject().flipY){
+                      _Canvas.getActiveObject().set("angle", "-180").set("flipY", true).set("top", 850).set("left", 850).set("lockMovementX",true)//set("angle", "-180").set('flipY', true);
+                }else{
+                    _Canvas.getActiveObject().set("angle", "0").set("flipY", false).set("top", 50).set("left", 50).set("lockMovementX",false)//set("angle", "-180").set('flipY', true);
+                }
+              
                 _Canvas.renderAll()
             }
             else if (type == "clear") {
@@ -577,6 +598,8 @@
                     img_draw = new fabric.Image(img_element, {
                         lockMovementX : true,
                         lockMovementY : true,
+                        top:50,
+                        left:50,
                         inverted: true,
                         opacity: (Math.abs(1 - alpha[i] / 100))
                     });
