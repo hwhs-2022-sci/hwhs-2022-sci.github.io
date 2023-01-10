@@ -282,13 +282,15 @@
                     } else {
                         imgCount++; activeImg++;
                         let place;
-                        //PopupAlert({'title':'正在取得資料...','body':'','escCallback':'dismiss','enterCallback':'console.log(123)'})
+                        //new server:https://services.swpc.noaa.gov/images/animations/ovation/north/aurora_N_2023-01-09_2030.jpg
+                        //           https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_2023-01-09_0805.jpg
+                        
                         if ($("#place-input").val() == "N") {
-                            url = `https://cors-helper.onrender.com/https://swoo.cwb.gov.tw/V2/img/Ovation/swpc_aurora_N_${date}_${time}.jpg`
+                            url = `https://cors-helper.onrender.com/https://services.swpc.noaa.gov/images/animations/ovation/north/aurora_N_${date}_${time}.jpg`
                             place = '北極'
                         } else {
                             place = '南極'
-                            url = `https://cors-helper.onrender.com/https://swoo.cwb.gov.tw/V2/img/Ovation/swpc_aurora_S_${date}_${time}.jpg`
+                            url = `https://cors-helper.onrender.com/https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_${date}_${time}.jpg`
                         }
                         $("#img-placeholder").remove()
                         $("#data-display").append(`
@@ -463,9 +465,9 @@
             else if (type == "flip") {
                 console.log()
                 if(!_Canvas.getActiveObject().flipY){
-                      _Canvas.getActiveObject().set("angle", "-180").set("flipY", true).set("top", 850).set("left", 850).set("lockMovementX",true)//set("angle", "-180").set('flipY', true);
+                      _Canvas.getActiveObject().set("angle", "-180").set("flipY", true).set("top", 850).set("left", 850)//set("angle", "-180").set('flipY', true);
                 }else{
-                    _Canvas.getActiveObject().set("angle", "0").set("flipY", false).set("top", 50).set("left", 50).set("lockMovementX",false)//set("angle", "-180").set('flipY', true);
+                    _Canvas.getActiveObject().set("angle", "0").set("flipY", false).set("top", 50).set("left", 50)//set("angle", "-180").set('flipY', true);
                 }
               
                 _Canvas.renderAll()
@@ -596,8 +598,7 @@
 
                 var img_element = document.querySelector("#img-" + data[i]),
                     img_draw = new fabric.Image(img_element, {
-                        lockMovementX : true,
-                        lockMovementY : true,
+
                         top:50,
                         left:50,
                         inverted: true,
