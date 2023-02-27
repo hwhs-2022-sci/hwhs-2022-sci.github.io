@@ -17,7 +17,8 @@
             display: flex !important;
         }
 
-        #data-display {
+        #data-display,
+        #output-display {
             max-height: 450px;
 
             padding: 5px;
@@ -38,6 +39,7 @@
 
         .data-item,
         #img-placeholder,
+        #output-placeholder,
         .cvs-layer {
             border: rgb(227, 227, 227) 1px solid;
             box-shadow: rgb(128, 128, 128) 2px 2px 3px;
@@ -69,7 +71,8 @@
             background-color: rgb(211, 211, 211);
         }
 
-        #img-placeholder {
+        #img-placeholder,
+        #output-placeholder {
             padding: 15px;
             display: block;
             margin-top: 15px !important;
@@ -123,6 +126,14 @@
 
             </div>
 
+            <hr>
+            <h2>資料顯示</h2>
+            <p>csv檔案是亂碼?參考<a href="https://www.managertoday.com.tw/articles/view/55615?" target="_blank">這篇</a>教學</p>
+            <div id="output-display">
+
+                <span id="output-placeholder">已經導出的資料<wbr>會顯示在這裡</span>
+
+            </div>
 
         </div>
         <div>
@@ -149,8 +160,9 @@
                 <button class="btn btn-primary" onclick="Canvas('flip')">翻轉</button>
                 <span style="user-select: none;">&nbsp;&nbsp;</span>
                 <button class="btn btn-danger" onclick="Canvas('clear')">清除</button>
-
-               <!-- <div class="form-check form-switch">
+                <span style="user-select: none;">&nbsp;&nbsp;</span>
+                <button class="btn btn-outline-primary" onclick="Canvas('export')">導出</button>
+                <!-- <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" checked id="flexSwitchCheckDefault"
                     onblur="
                     var allobj = _Canvas.getObjects(),
@@ -165,7 +177,40 @@
                     <label class="form-check-label" for="flexSwitchCheckDefault">鎖定移動</label>
                 </div>-->
             </div>
+            <br>
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            顯示詳細資料
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                        data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <p>此處數據僅供參考<br>詳細數據請參考導出的csv檔案</p>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">名稱</th>
+                                        <th scope="col">左上</th>
+                                        <th scope="col">右上</th>
+                                        <th scope="col">左下</th>
+                                        <th scope="col">右下</th>
+                                        <th scope="col">方向</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="data-table">
 
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
             <p></p>
             <canvas id="canvas" style="border: 1px solid #000;width: 850px;height: 850px;" width="850"
                 height="850">你的瀏覽器不支援我們使用的技術.</canvas>
@@ -177,13 +222,13 @@
     </span>
 
     <div id="ui-bottom" style="padding: 5px;">
-        <span>資料來源:中央氣象局</span>
+        <span>資料來源:NOAA</span>
         <span style="user-select: none;">&nbsp;&nbsp;</span>
 
         <span style="user-select: none;">&nbsp;&nbsp;</span>
         <span style="float: right;position: absolute; right: 0;"
-            onclick="PopupAlert({title:`關於`,body:`<h5>極光資料分析</h5><h6>v1.0 <span class='badge bg-primary'>BETA</span><br>BY Jerry 2022-12-07</h6>`})">By
-            Jerry 2022-11 v1.0 BETA</span>
+            onclick="PopupAlert({title:`關於`,body:`<h5>極光資料分析</h5><h6>v1.0 <br>BY Jerry 2022-03</h6>`})">By
+            Jerry 2023.03 v1.0</span>
     </div>
 
     <!--  <div hidden="hidden"><img
@@ -235,7 +280,9 @@
         integrity='sha512-q7T9VUu0gBgAGV3YkcvI0wjeBJONO5Cg/+688NkDC6qupjUvEG9ZmNK4GjZWvWuuT1VIjS0abwE1IKXVew8Ohw=='
         crossorigin='anonymous'></script>
 
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"
+        integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <!--------------------------MAIN SCRIPT----------------------------->
 
@@ -277,20 +324,20 @@
                 if (!date == '' && !time == '') {
 
                     if (time % 5 !== 0) {
-                        PopupAlert({ 'title': '注意', 'body': '中央氣象局的資料間隔為5分鐘，例:<br>12:00 , 15:50 , 01:25<br>請重新輸入資料', 'escCallBack': 'x', 'enterCallBack': 'dismiss' })
+                        PopupAlert({ 'title': '注意', 'body': '資料間隔為5分鐘，例:<br>12:00 , 15:50 , 01:25<br>請重新輸入資料', 'escCallBack': 'x', 'enterCallBack': 'dismiss' })
 
                     } else {
                         imgCount++; activeImg++;
                         let place;
                         //new server:https://services.swpc.noaa.gov/images/animations/ovation/north/aurora_N_2023-01-09_2030.jpg
                         //           https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_2023-01-09_0805.jpg
-                        
+
                         if ($("#place-input").val() == "N") {
-                            url = `https://cors-helper.onrender.com/https://services.swpc.noaa.gov/images/animations/ovation/north/aurora_N_${date}_${time}.jpg`
+                            url = `https://cors-helper-2.onrender.com/https://services.swpc.noaa.gov/images/animations/ovation/north/aurora_N_${date}_${time}.jpg`
                             place = '北極'
                         } else {
                             place = '南極'
-                            url = `https://cors-helper.onrender.com/https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_${date}_${time}.jpg`
+                            url = `https://cors-helper-2.onrender.com/https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_${date}_${time}.jpg`
                         }
                         $("#img-placeholder").remove()
                         $("#data-display").append(`
@@ -309,7 +356,7 @@
                                 </button>
                             </div>
                             <br>
-                            <span data-from="cwb" id="data-from-${imgCount}">取自:中央氣象局</span>
+                            <span data-from="cwb" id="data-from-${imgCount}">取自:NOAA</span>
                             <br>
                             <span id="data-filename-${imgCount}" data-fileName="${date}_${$("#time-input").val()}_${place}.png">${date}&nbsp;${$("#time-input").val()}&nbsp;<wbr>${place}</span>
                             <br>
@@ -318,7 +365,7 @@
                             <div class="spinner-border text-primary spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>
                             圖片載入中...
                             </div>
-                            <span class='text-secondary'>#${imgCount}</span>
+                            <span class='text-secondary'>圖片 #${imgCount}</span>
                         </div>
                     </div>
                 </div>
@@ -346,29 +393,29 @@
             }
             else if (type == "error") {
                 if (!errorImgArr.includes(par.num)) {
-                    PopupAlert({
-                        title: "讀取圖片 #" + par.num + " 時出錯", body: `
-        <h1 class="text-primary">: (</h1>
-        <span class="text-secondary">讀取圖片 #${par.num} 時出錯<br>請參閱下方建議，再試一次</span>
-        <p></p>
-        <div class="accordion">
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"  aria-expanded="false">
-                建議作為
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse " data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                    <ol>
-                        <li>檢查網路連線</li>
-                        <li>檢查資料數據</li>
-                    </ol>
-                </div>
-            </div>
-            </div>
-        </div>`, enterCallBack: "dismiss", escCallBack: "x"
-                    })
+                    /* PopupAlert({
+                         title: "讀取圖片 #" + par.num + " 時出錯", body: `
+         <h1 class="text-primary">: (</h1>
+         <span class="text-secondary">讀取圖片 #${par.num} 時出錯<br>請參閱下方建議，再試一次</span>
+         <p></p>
+         <div class="accordion">
+         <div class="accordion-item">
+             <h2 class="accordion-header">
+                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"  aria-expanded="false">
+                 建議作為
+                 </button>
+             </h2>
+             <div id="collapseOne" class="accordion-collapse collapse " data-bs-parent="#accordionExample">
+                 <div class="accordion-body">
+                     <ol>
+                         <li>檢查網路連線</li>
+                         <li>檢查資料數據</li>
+                     </ol>
+                 </div>
+             </div>
+             </div>
+         </div>`, enterCallBack: "dismiss", escCallBack: "x"
+                     })*/
                     errorImgArr.push('data-' + par.num)
                     $('#' + par.id).remove();
                     //      $('.cvs-select-' + par.num).remove()
@@ -407,7 +454,7 @@
         }
 
 
-        var layerCount = 0;
+        var layerCount = 0, record = [];
         function Canvas(type, par) {
 
             if (type == 'addLayer') {
@@ -450,7 +497,7 @@
                 }
 
 
-
+                record = []
                 let alpha = [], img = [];
 
                 for (i = 0; i < Math.floor($("#cvs-imgLayers").attr("data-count")); i++) {
@@ -464,13 +511,14 @@
             }
             else if (type == "flip") {
                 console.log()
-                if(!_Canvas.getActiveObject().flipY){
-                      _Canvas.getActiveObject().set("angle", "-180").set("flipY", true).set("top", 850).set("left", 850)//set("angle", "-180").set('flipY', true);
-                }else{
+                if (!_Canvas.getActiveObject().flipY) {
+                    _Canvas.getActiveObject().set("angle", "-180").set("flipY", true).set("top", 850).set("left", 850)//set("angle", "-180").set('flipY', true);
+                } else {
                     _Canvas.getActiveObject().set("angle", "0").set("flipY", false).set("top", 50).set("left", 50)//set("angle", "-180").set('flipY', true);
                 }
-              
+
                 _Canvas.renderAll()
+                Canvas("update_data")
             }
             else if (type == "clear") {
                 var selected = _Canvas.getActiveObjects(),
@@ -503,8 +551,138 @@
                 }
                 // Use discardActiveObject to remove the selection border
                 _Canvas.discardActiveObject().renderAll();
+                Canvas("update_data")
+            }
+            else if (type === "update_data") {
+                console.log(_Canvas.getObjects())
+                let objs = _Canvas.getObjects(),
+                    _arr = []
+                $("#data-table").html("")
+                for (i = 0; i < objs.length; i++) {
+                    $("#data-table").append(`
+                    <tr>
+                    <td>${objs[i].name}</td>
+                    <td>(${objs[i].oCoords.tl.x.toFixed(2)},${objs[i].oCoords.tl.y.toFixed(2)})</td>
+                    <td>(${objs[i].oCoords.tr.x.toFixed(2)},${objs[i].oCoords.tr.y.toFixed(2)})</td>
+                    <td>(${objs[i].oCoords.bl.x.toFixed(2)},${objs[i].oCoords.bl.y.toFixed(2)})</td>
+                    <td>(${objs[i].oCoords.br.x.toFixed(2)},${objs[i].oCoords.br.y.toFixed(2)})</td>
+                    <td>${objs[i].angle.toFixed(2)}</td>
+                    </tr>
+                   `)
+                }
+            } else if (type == "export") {
+                Data("add")
             }
         }
+
+        var dataCount = 0, activeData = 0, dataSet = [], fileIDArr = [];
+        function Data(type, par, par2) {
+            if (type == "add") {
+
+                $("#output-placeholder").remove()
+                dataCount++
+                activeData++
+
+
+
+
+
+
+                let objs = _Canvas.getObjects()
+                let text = [["圖層名稱", "左上X", "左上Y", "右上X", "右上Y", "左下X", "左下Y", "右下X", "右下Y", "角度"]]
+                for (i = 0; i < objs.length; i++) {
+                    text.push([
+                        objs[i].name,
+                        objs[i].oCoords.tl.x,
+                        objs[i].oCoords.tl.y,
+                        objs[i].oCoords.tr.x,
+                        objs[i].oCoords.tr.y,
+                        objs[i].oCoords.bl.x,
+                        objs[i].oCoords.bl.y,
+                        objs[i].oCoords.br.x,
+                        objs[i].oCoords.br.y,
+                        objs[i].angle
+                    ])
+                }
+                console.log(text)
+                fileIDArr.push(`csv-${dataCount}`)
+                dataSet.push(text)
+                text = ""
+                for (i = 0; i < Math.floor($("#cvs-imgLayers").attr("data-count")); i++) {
+                    if (i >= 1) {
+                        text = text + "與" + $(`#data-filename-${$("#img-data-list-" + i).val()}`).attr("data-filename").split(".")[0]
+                    }
+                    else {
+                        text = text + $(`#data-filename-${$("#img-data-list-" + i).val()}`).attr("data-filename").split(".")[0]
+                    }
+                }
+                text = text + "的疊圖分析"
+                $("#output-display").append(`
+                <div id="outData-container-${dataCount}-toggle" class="data-item p-2 bg-primary text-white" type="button" data-bs-toggle="collapse" data-bs-target="#outData-container-${dataCount}" aria-expanded="false" aria-controls="outData-container-${dataCount}">
+                    <i class="bi bi-folder"></i> 資料組 #${dataCount}
+                </div>
+                <div class="collapse" id="outData-container-${dataCount}"><div class="data-item" id="outData-container-${dataCount}-image"><div class="d-flex"><div class="data-image"><img id="outData-img-${dataCount}" alt='無法預覽' src="${_Canvas.toDataURL()}"></div><div style="padding: 5px;"><div class="btn-group" role="group" aria-label="toolbar"><a href="${_Canvas.toDataURL()}" download="${text}.png" class="btn btn-primary"><i class="bi bi-download"></i></a><button type="button" class="btn btn-danger" onclick="Data('del','outData-container-${dataCount}','image')"><i class="bi bi-trash"></i></button></div><br><span data-fileName="${text}.png">${text}</span><br><span class='text-secondary'>資料組 #${dataCount}</span><br><span class='text-secondary'>圖片</span></div></div></div><div class="data-item" id="outData-container-${dataCount}-csv"><div class="d-flex"><div class="data-image" style="display: flex;align-items: center;justify-content: center;min-width:200px"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-filetype-csv" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5ZM3.517 14.841a1.13 1.13 0 0 0 .401.823c.13.108.289.192.478.252.19.061.411.091.665.091.338 0 .624-.053.859-.158.236-.105.416-.252.539-.44.125-.189.187-.408.187-.656 0-.224-.045-.41-.134-.56a1.001 1.001 0 0 0-.375-.357 2.027 2.027 0 0 0-.566-.21l-.621-.144a.97.97 0 0 1-.404-.176.37.37 0 0 1-.144-.299c0-.156.062-.284.185-.384.125-.101.296-.152.512-.152.143 0 .266.023.37.068a.624.624 0 0 1 .246.181.56.56 0 0 1 .12.258h.75a1.092 1.092 0 0 0-.2-.566 1.21 1.21 0 0 0-.5-.41 1.813 1.813 0 0 0-.78-.152c-.293 0-.551.05-.776.15-.225.099-.4.24-.527.421-.127.182-.19.395-.19.639 0 .201.04.376.122.524.082.149.2.27.352.367.152.095.332.167.539.213l.618.144c.207.049.361.113.463.193a.387.387 0 0 1 .152.326.505.505 0 0 1-.085.29.559.559 0 0 1-.255.193c-.111.047-.249.07-.413.07-.117 0-.223-.013-.32-.04a.838.838 0 0 1-.248-.115.578.578 0 0 1-.255-.384h-.765ZM.806 13.693c0-.248.034-.46.102-.633a.868.868 0 0 1 .302-.399.814.814 0 0 1 .475-.137c.15 0 .283.032.398.097a.7.7 0 0 1 .272.26.85.85 0 0 1 .12.381h.765v-.072a1.33 1.33 0 0 0-.466-.964 1.441 1.441 0 0 0-.489-.272 1.838 1.838 0 0 0-.606-.097c-.356 0-.66.074-.911.223-.25.148-.44.359-.572.632-.13.274-.196.6-.196.979v.498c0 .379.064.704.193.976.131.271.322.48.572.626.25.145.554.217.914.217.293 0 .554-.055.785-.164.23-.11.414-.26.55-.454a1.27 1.27 0 0 0 .226-.674v-.076h-.764a.799.799 0 0 1-.118.363.7.7 0 0 1-.272.25.874.874 0 0 1-.401.087.845.845 0 0 1-.478-.132.833.833 0 0 1-.299-.392 1.699 1.699 0 0 1-.102-.627v-.495Zm8.239 2.238h-.953l-1.338-3.999h.917l.896 3.138h.038l.888-3.138h.879l-1.327 4Z"/></svg></div><div style="padding: 5px;"><div class="btn-group" role="group" aria-label="toolbar"><button type="button" class="btn btn-primary" onclick="Data('dl',${dataCount},'csv')"><i class="bi bi-download"></i></button><button type="button" class="btn btn-danger" onclick="Data('del','outData-container-${dataCount}','csv')"><i class="bi bi-trash"></i></button></div><br><span id="csv-${dataCount}" data-fileName="${text}.csv">${text}</span><br><span class='text-secondary'>資料組 #${dataCount}</span><br><span class='text-secondary'>CSV檔案</span></div></div></div></div>
+                `)
+            } else if (type == "del") {
+                PopupAlert({
+                    title: '確定刪除資料?',
+                    body: '刪除之後無法復原',
+                    escCallBack: 'dismiss',
+                    enterCallBack: `$('#${par}-${par2}').remove();if($('#${par}').html() == ""){activeData--;$("#${par}-toggle").remove()}if(activeData==0){$('#output-display').append('<span id=output-placeholder>已經導出的資料<wbr>會顯示在這裡</span>')}`
+                })
+
+            } else if (type == "dl") {
+                if (par2 == "image") {
+
+                } else if (par2 == "csv") {
+                    exportToCsv($(`#csv-${par}`).attr("data-filename"), 
+                      dataSet[fileIDArr.indexOf("csv-"+par)]
+                    )
+                }
+            }
+        }
+
+        function exportToCsv(filename, rows) {
+            var processRow = function (row) {
+                var finalVal = '';
+                for (var j = 0; j < row.length; j++) {
+                    var innerValue = row[j] === null ? '' : row[j].toString();
+                    if (row[j] instanceof Date) {
+                        innerValue = row[j].toLocaleString();
+                    };
+                    var result = innerValue.replace(/"/g, '""');
+                    if (result.search(/("|,|\n)/g) >= 0)
+                        result = '"' + result + '"';
+                    if (j > 0)
+                        finalVal += ',';
+                    finalVal += result;
+                }
+                return finalVal + '\n';
+            };
+
+            var csvFile = '';
+            for (var i = 0; i < rows.length; i++) {
+                csvFile += processRow(rows[i]);
+            }
+
+            var blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, filename);
+            } else {
+                var link = document.createElement("a");
+                if (link.download !== undefined) { // feature detection
+                    // Browsers that support HTML5 download attribute
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", filename);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            }
+        }
+
         //  {title, body, escCallBack, enterCallBack, closeButtonStatue}
         function removeElementFromArray(arr, ele) {
 
@@ -598,15 +776,15 @@
 
                 var img_element = document.querySelector("#img-" + data[i]),
                     img_draw = new fabric.Image(img_element, {
-
-                        top:50,
-                        left:50,
+                        name: `第 ${i} 層`,
+                        top: 50,
+                        left: 50,
                         inverted: true,
                         opacity: (Math.abs(1 - alpha[i] / 100))
                     });
                 console.log(img_element)
                 _Canvas.add(img_draw)
-
+                Canvas("update_data")
             }
         }
 
@@ -634,6 +812,12 @@
             // Use discardActiveObject to remove the selection border
             _Canvas.discardActiveObject().renderAll();
         }
+
+
+
+        _Canvas.on("object:modified", function (obj) {
+            Canvas("update_data")
+        })
 
 
 
@@ -690,32 +874,8 @@
         </div>`, enterCallBack: "dismiss", escCallBack: "x"
             })
         }
-        window.onoffline = function (e) {
-            PopupAlert({
-                title: "沒有網路連線", body: `
-        <h1 class="text-primary">: (</h1>
-        <span class="text-secondary">目前沒有網路連線<br>無法獲取圖片</span>
-        <p></p>
-        <div class="accordion">
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"  aria-expanded="false">
-                排除方法
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse " data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                <ol>
-                    <li>檢查裝置網路訊號</li>
-                    <li>重新啟動wifi/行動數據連線</li>
-                    <li>重新啟動你的裝置</li>    
-                </ol>
-                </div>
-            </div>
-            </div>
-        </div>`, enterCallBack: "dismiss", escCallBack: "x"
-            })
-        }
+
+
     </script>
 </body>
 
