@@ -403,11 +403,11 @@
 </div>
 `)
                         $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
-                        $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
 
                     }
                     reader.readAsDataURL(input.files[i]);
                 }
+                $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
 
 
 

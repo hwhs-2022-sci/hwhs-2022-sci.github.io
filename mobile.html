@@ -135,17 +135,17 @@
                 </div>
     
                 <hr>
-                <h2>4.資料顯示</h2>
+                <!--<h2>4.資料顯示</h2>
                 <p>按下資料夾圖示以展開檔案內容<br>下載後的csv檔案是亂碼?參考<a href="https://www.managertoday.com.tw/articles/view/55615?"
                         target="_blank">這篇</a>教學</p>
                 <div id="output-display">
     
                     <span id="output-placeholder">已經導出的資料<wbr>會顯示在這裡</span>
     
-                </div>
+                </div>-->
     
             </div>
-            <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+            <!--<div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
                 <h2>3.圖片分析</h2>
             <p>從選單選擇圖片，開始分析</p>
             <div id="cvs-imgLayers" data-count="1">
@@ -172,7 +172,7 @@
                 <button class="btn btn-danger" onclick="Canvas('clear')">清除</button>
                 <span style="user-select: none;">&nbsp;&nbsp;</span>
                 <button class="btn btn-outline-primary" onclick="Canvas('export')">導出</button>
-                <!-- <div class="form-check form-switch">
+                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" checked id="flexSwitchCheckDefault"
                     onblur="
                     var allobj = _Canvas.getObjects(),
@@ -185,7 +185,7 @@
                         });
                     ">
                     <label class="form-check-label" for="flexSwitchCheckDefault">鎖定移動</label>
-                </div>-->
+                </div>
             </div>
             <br>
             <div class="accordion" id="accordionExample">
@@ -233,12 +233,12 @@
                 <br>
                 <span>By Jerry 2023-03 v1.0 
 
-        </div>
+        </div>-->
 
 
 
 
-    </div>
+    </div><!--
     <div class="d-flex " id="ui-bottom" role="tablist" style="    
         flex-wrap: nowrap;
         flex-direction: row;
@@ -262,7 +262,7 @@
                 data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane"
                 aria-selected="false">關於</button>
         </div>
-    </div>
+    </div>-->
     <!--
     <div id="ui-bottom" style="padding: 5px;">
         <span>資料來源:中央氣象局</span>
@@ -342,7 +342,7 @@ window.mobileAndTabletCheck = function () {
     return check;
 };
 if (!window.mobileAndTabletCheck()) {
-    location.href = "/index.html"
+  //  location.href = "/index.html"
 }
 
 
@@ -374,11 +374,11 @@ function Img(type, par) {
                 //           https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_2023-01-09_0805.jpg
 
                 if ($("#place-input").val() == "N") {
-                    url = `https://cors-helper-2.onrender.com/https://services.swpc.noaa.gov/images/animations/ovation/north/aurora_N_${date}_${time}.jpg`
+                    url = `https://services.swpc.noaa.gov/images/animations/ovation/north/aurora_N_${date}_${time}.jpg`
                     place = '北極'
                 } else {
                     place = '南極'
-                    url = `https://cors-helper-2.onrender.com/https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_${date}_${time}.jpg`
+                    url = `https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_${date}_${time}.jpg`
                 }
                 $("#img-placeholder").remove()
                 $("#data-display").append(`
