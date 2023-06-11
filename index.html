@@ -235,10 +235,6 @@
             Jerry 2023.03 v1.0</span>
     </div>
 
-    <!--  <div hidden="hidden"><img
-            src="https://cors-helper.onrender.com/image"
-            alt="連線失敗:(" onerror="window.corsDisconnect()"></div>
--->
 
     <!--------------------------BS.Modal----------------------------->
 
@@ -268,7 +264,7 @@
         </div>
     </div>
 
-
+    <div id="export-doc"></div>
 
     <!--------------------------SCRIPT.LIB----------------------------->
 
@@ -287,6 +283,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"
         integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+        integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="/html-docx.js"></script>
 
     <!--------------------------MAIN SCRIPT----------------------------->
 
@@ -308,6 +309,41 @@
             location.href = "/mobile.html"
         }
 
+
+        //date -> formated str (y/m/d)
+        //time -> formated str (h:m:s)
+        //pack -> {year,month,date,day,hour,minute,second}
+        function getTime(type) {
+            var DATE = new Date(),
+                year = DATE.getFullYear(),
+                mont = DATE.getMonth() + 1,
+                date = DATE.getDate(),
+                day = DATE.getDay(),
+                //--------------------//
+                hour = DATE.getHours(),
+                mins = DATE.getMinutes(),
+                secs = DATE.getSeconds();
+
+            if (type == "date") {
+                return `${year} / ${mont} / ${date}`
+            } else
+                if (type == "time") {
+                    return `${hour} : ${mins} : ${secs}`
+                } else
+                    if (type == "pack") {
+                        let par = {
+                            "year": year,
+                            "month": mont,
+                            "date": date,
+                            "day": day,
+                            "hour": hour > 9 ? hour : '0' + hour,
+                            "minute": mins > 9 ? mins : '0' + mins,
+                            "second": secs > 9 ? secs : '0' + secs
+                        }
+
+                        return par
+                    }
+        }
 
 
         var imgCount = 0, activeImg = 0, errorImgArr = [], imgNums = [], imgData = [];
@@ -587,11 +623,6 @@
                 dataCount++
                 activeData++
 
-
-
-
-
-
                 let objs = _Canvas.getObjects()
                 let text = [["圖層名稱", "左上X", "左上Y", "右上X", "右上Y", "左下X", "左下Y", "右下X", "右下Y", "角度"]]
                 for (i = 0; i < objs.length; i++) {
@@ -610,7 +641,14 @@
                 }
                 console.log(text)
                 fileIDArr.push(`csv-${dataCount}`)
-                dataSet.push(text)
+                dataSet.push({
+                    "csv": [], "docx": {
+                        main_img: `outData-img-${dataCount}`,
+                        Nimg: `img-${$("#img-data-list-" + 0).val()}`,
+                        Simg: `img-${$("#img-data-list-" + 1).val()}`
+                    }
+                })
+                dataSet[fileIDArr.indexOf(`csv-${dataCount}`)].csv = text
                 text = ""
                 for (i = 0; i < Math.floor($("#cvs-imgLayers").attr("data-count")); i++) {
                     if (i >= 1) {
@@ -622,10 +660,64 @@
                 }
                 text = text + "的疊圖分析"
                 $("#output-display").append(`
-                <div id="outData-container-${dataCount}-toggle" class="data-item p-2 bg-primary text-white" type="button" data-bs-toggle="collapse" data-bs-target="#outData-container-${dataCount}" aria-expanded="false" aria-controls="outData-container-${dataCount}">
-                    <i class="bi bi-folder"></i> 資料組 #${dataCount}
-                </div>
-                <div class="collapse" id="outData-container-${dataCount}"><div class="data-item" id="outData-container-${dataCount}-image"><div class="d-flex"><div class="data-image"><img id="outData-img-${dataCount}" alt='無法預覽' src="${_Canvas.toDataURL()}"></div><div style="padding: 5px;"><div class="btn-group" role="group" aria-label="toolbar"><a href="${_Canvas.toDataURL()}" download="${text}.png" class="btn btn-primary"><i class="bi bi-download"></i></a><button type="button" class="btn btn-danger" onclick="Data('del','outData-container-${dataCount}','image')"><i class="bi bi-trash"></i></button></div><br><span data-fileName="${text}.png">${text}</span><br><span class='text-secondary'>資料組 #${dataCount}</span><br><span class='text-secondary'>圖片</span></div></div></div><div class="data-item" id="outData-container-${dataCount}-csv"><div class="d-flex"><div class="data-image" style="display: flex;align-items: center;justify-content: center;min-width:200px"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-filetype-csv" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5ZM3.517 14.841a1.13 1.13 0 0 0 .401.823c.13.108.289.192.478.252.19.061.411.091.665.091.338 0 .624-.053.859-.158.236-.105.416-.252.539-.44.125-.189.187-.408.187-.656 0-.224-.045-.41-.134-.56a1.001 1.001 0 0 0-.375-.357 2.027 2.027 0 0 0-.566-.21l-.621-.144a.97.97 0 0 1-.404-.176.37.37 0 0 1-.144-.299c0-.156.062-.284.185-.384.125-.101.296-.152.512-.152.143 0 .266.023.37.068a.624.624 0 0 1 .246.181.56.56 0 0 1 .12.258h.75a1.092 1.092 0 0 0-.2-.566 1.21 1.21 0 0 0-.5-.41 1.813 1.813 0 0 0-.78-.152c-.293 0-.551.05-.776.15-.225.099-.4.24-.527.421-.127.182-.19.395-.19.639 0 .201.04.376.122.524.082.149.2.27.352.367.152.095.332.167.539.213l.618.144c.207.049.361.113.463.193a.387.387 0 0 1 .152.326.505.505 0 0 1-.085.29.559.559 0 0 1-.255.193c-.111.047-.249.07-.413.07-.117 0-.223-.013-.32-.04a.838.838 0 0 1-.248-.115.578.578 0 0 1-.255-.384h-.765ZM.806 13.693c0-.248.034-.46.102-.633a.868.868 0 0 1 .302-.399.814.814 0 0 1 .475-.137c.15 0 .283.032.398.097a.7.7 0 0 1 .272.26.85.85 0 0 1 .12.381h.765v-.072a1.33 1.33 0 0 0-.466-.964 1.441 1.441 0 0 0-.489-.272 1.838 1.838 0 0 0-.606-.097c-.356 0-.66.074-.911.223-.25.148-.44.359-.572.632-.13.274-.196.6-.196.979v.498c0 .379.064.704.193.976.131.271.322.48.572.626.25.145.554.217.914.217.293 0 .554-.055.785-.164.23-.11.414-.26.55-.454a1.27 1.27 0 0 0 .226-.674v-.076h-.764a.799.799 0 0 1-.118.363.7.7 0 0 1-.272.25.874.874 0 0 1-.401.087.845.845 0 0 1-.478-.132.833.833 0 0 1-.299-.392 1.699 1.699 0 0 1-.102-.627v-.495Zm8.239 2.238h-.953l-1.338-3.999h.917l.896 3.138h.038l.888-3.138h.879l-1.327 4Z"/></svg></div><div style="padding: 5px;"><div class="btn-group" role="group" aria-label="toolbar"><button type="button" class="btn btn-primary" onclick="Data('dl',${dataCount},'csv')"><i class="bi bi-download"></i></button><button type="button" class="btn btn-danger" onclick="Data('del','outData-container-${dataCount}','csv')"><i class="bi bi-trash"></i></button></div><br><span id="csv-${dataCount}" data-fileName="${text}.csv">${text}</span><br><span class='text-secondary'>資料組 #${dataCount}</span><br><span class='text-secondary'>CSV檔案</span></div></div></div></div>
+                <div id="outData-container-${dataCount}-toggle" class="data-item p-2 bg-primary text-white" type="button"
+    data-bs-toggle="collapse" data-bs-target="#outData-container-${dataCount}" aria-expanded="false"
+    aria-controls="outData-container-${dataCount}">
+    <i class="bi bi-folder"></i> 資料組 #${dataCount}
+</div>
+<div class="collapse" id="outData-container-${dataCount}">
+    <div class="data-item" id="outData-container-${dataCount}-image">
+        <div class="d-flex">
+            <div class="data-image"><img id="outData-img-${dataCount}" alt='無法預覽' src="${_Canvas.toDataURL()}"></div>
+            <div style="padding: 5px;">
+                <div class="btn-group" role="group" aria-label="toolbar"><a href="${_Canvas.toDataURL()}"
+                        download="${text}.png" class="btn btn-primary"><i class="bi bi-download"></i></a><button
+                        type="button" class="btn btn-danger"
+                        onclick="Data('del','outData-container-${dataCount}','image')"><i
+                            class="bi bi-trash"></i></button></div><br><span
+                    data-fileName="${text}.png">${text}</span><br><span class='text-secondary'>資料組
+                    #${dataCount}</span><br><span class='text-secondary'>圖片</span>
+            </div>
+        </div>
+    </div>
+    <div class="data-item" id="outData-container-${dataCount}-csv">
+        <div class="d-flex">
+            <div class="data-image" style="display: flex;align-items: center;justify-content: center;min-width:200px">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor"
+                    class="bi bi-filetype-csv" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                        d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5ZM3.517 14.841a1.13 1.13 0 0 0 .401.823c.13.108.289.192.478.252.19.061.411.091.665.091.338 0 .624-.053.859-.158.236-.105.416-.252.539-.44.125-.189.187-.408.187-.656 0-.224-.045-.41-.134-.56a1.001 1.001 0 0 0-.375-.357 2.027 2.027 0 0 0-.566-.21l-.621-.144a.97.97 0 0 1-.404-.176.37.37 0 0 1-.144-.299c0-.156.062-.284.185-.384.125-.101.296-.152.512-.152.143 0 .266.023.37.068a.624.624 0 0 1 .246.181.56.56 0 0 1 .12.258h.75a1.092 1.092 0 0 0-.2-.566 1.21 1.21 0 0 0-.5-.41 1.813 1.813 0 0 0-.78-.152c-.293 0-.551.05-.776.15-.225.099-.4.24-.527.421-.127.182-.19.395-.19.639 0 .201.04.376.122.524.082.149.2.27.352.367.152.095.332.167.539.213l.618.144c.207.049.361.113.463.193a.387.387 0 0 1 .152.326.505.505 0 0 1-.085.29.559.559 0 0 1-.255.193c-.111.047-.249.07-.413.07-.117 0-.223-.013-.32-.04a.838.838 0 0 1-.248-.115.578.578 0 0 1-.255-.384h-.765ZM.806 13.693c0-.248.034-.46.102-.633a.868.868 0 0 1 .302-.399.814.814 0 0 1 .475-.137c.15 0 .283.032.398.097a.7.7 0 0 1 .272.26.85.85 0 0 1 .12.381h.765v-.072a1.33 1.33 0 0 0-.466-.964 1.441 1.441 0 0 0-.489-.272 1.838 1.838 0 0 0-.606-.097c-.356 0-.66.074-.911.223-.25.148-.44.359-.572.632-.13.274-.196.6-.196.979v.498c0 .379.064.704.193.976.131.271.322.48.572.626.25.145.554.217.914.217.293 0 .554-.055.785-.164.23-.11.414-.26.55-.454a1.27 1.27 0 0 0 .226-.674v-.076h-.764a.799.799 0 0 1-.118.363.7.7 0 0 1-.272.25.874.874 0 0 1-.401.087.845.845 0 0 1-.478-.132.833.833 0 0 1-.299-.392 1.699 1.699 0 0 1-.102-.627v-.495Zm8.239 2.238h-.953l-1.338-3.999h.917l.896 3.138h.038l.888-3.138h.879l-1.327 4Z" />
+                </svg></div>
+            <div style="padding: 5px;">
+                <div class="btn-group" role="group" aria-label="toolbar"><button type="button" class="btn btn-primary"
+                        onclick="Data('dl',${dataCount},'csv')"><i class="bi bi-download"></i></button><button
+                        type="button" class="btn btn-danger"
+                        onclick="Data('del','outData-container-${dataCount}','csv')"><i
+                            class="bi bi-trash"></i></button></div><br><span id="csv-${dataCount}"
+                    data-fileName="${text}.csv">${text}</span><br><span class='text-secondary'>資料組
+                    #${dataCount}</span><br><span class='text-secondary'>CSV檔案</span>
+            </div>
+        </div>
+    </div>
+    <div class="data-item" id="outData-container-${dataCount}-docx">
+        <div class="d-flex">
+            <div class="data-image" style="display: flex;align-items: center;justify-content: center;min-width:200px">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-filetype-docx" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M14 4.5V11h-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5Zm-6.839 9.688v-.522a1.54 1.54 0 0 0-.117-.641.861.861 0 0 0-.322-.387.862.862 0 0 0-.469-.129.868.868 0 0 0-.471.13.868.868 0 0 0-.32.386 1.54 1.54 0 0 0-.117.641v.522c0 .256.04.47.117.641a.868.868 0 0 0 .32.387.883.883 0 0 0 .471.126.877.877 0 0 0 .469-.126.861.861 0 0 0 .322-.386 1.55 1.55 0 0 0 .117-.642Zm.803-.516v.513c0 .375-.068.7-.205.973a1.47 1.47 0 0 1-.589.627c-.254.144-.56.216-.917.216a1.86 1.86 0 0 1-.92-.216 1.463 1.463 0 0 1-.589-.627 2.151 2.151 0 0 1-.205-.973v-.513c0-.379.069-.704.205-.975.137-.274.333-.483.59-.627.257-.147.564-.22.92-.22.357 0 .662.073.916.22.256.146.452.356.59.63.136.271.204.595.204.972ZM1 15.925v-3.999h1.459c.406 0 .741.078 1.005.235.264.156.46.382.589.68.13.296.196.655.196 1.074 0 .422-.065.784-.196 1.084-.131.301-.33.53-.595.689-.264.158-.597.237-.999.237H1Zm1.354-3.354H1.79v2.707h.563c.185 0 .346-.028.483-.082a.8.8 0 0 0 .334-.252c.088-.114.153-.254.196-.422a2.3 2.3 0 0 0 .068-.592c0-.3-.04-.552-.118-.753a.89.89 0 0 0-.354-.454c-.158-.102-.361-.152-.61-.152Zm6.756 1.116c0-.248.034-.46.103-.633a.868.868 0 0 1 .301-.398.814.814 0 0 1 .475-.138c.15 0 .283.032.398.097a.7.7 0 0 1 .273.26.85.85 0 0 1 .12.381h.765v-.073a1.33 1.33 0 0 0-.466-.964 1.44 1.44 0 0 0-.49-.272 1.836 1.836 0 0 0-.606-.097c-.355 0-.66.074-.911.223-.25.148-.44.359-.571.633-.131.273-.197.6-.197.978v.498c0 .379.065.704.194.976.13.271.321.48.571.627.25.144.555.216.914.216.293 0 .555-.054.785-.164.23-.11.414-.26.551-.454a1.27 1.27 0 0 0 .226-.674v-.076h-.765a.8.8 0 0 1-.117.364.699.699 0 0 1-.273.248.874.874 0 0 1-.401.088.845.845 0 0 1-.478-.131.834.834 0 0 1-.298-.393 1.7 1.7 0 0 1-.103-.627v-.495Zm5.092-1.76h.894l-1.275 2.006 1.254 1.992h-.908l-.85-1.415h-.035l-.852 1.415h-.862l1.24-2.015-1.228-1.984h.932l.832 1.439h.035l.823-1.439Z"/>
+                  </svg>
+            </div>
+            <div style="padding: 5px;">
+                <div class="btn-group" role="group" aria-label="toolbar"><button type="button" class="btn btn-primary"
+                        onclick="Data('dl',${dataCount},'docx')"><i class="bi bi-download"></i></button><button
+                        type="button" class="btn btn-danger"
+                        onclick="Data('del','outData-container-${dataCount}','docx')"><i
+                        class="bi bi-trash"></i></button></div><br><span id="docx-${dataCount}"
+                    data-fileName="${text}.docx">${text}</span><br><span class='text-secondary'>資料組
+                    #${dataCount}</span><br><span class='text-secondary'>DOCX檔案<br><textarea id="summery-${dataCount}" placeholder="新增說明..." style="height: 38px;"></textarea></span>
+            </div>
+        </div>
+    </div>
+</div>
                 `)
             } else if (type == "del") {
                 PopupAlert({
@@ -640,8 +732,11 @@
 
                 } else if (par2 == "csv") {
                     exportToCsv($(`#csv-${par}`).attr("data-filename"),
-                        dataSet[fileIDArr.indexOf("csv-" + par)]
+                        dataSet[fileIDArr.indexOf("csv-" + par)].csv
                     )
+                } else if (par2 == "docx") {
+                    console.log(dataSet[fileIDArr.indexOf("csv-" + par)])
+                    generateDOCX($(`#docx-${par}`).attr("data-filename"), dataSet[fileIDArr.indexOf("csv-" + par)].docx, dataSet[fileIDArr.indexOf("csv-" + par)].csv, par)
                 }
             }
         }
@@ -830,43 +925,9 @@
             _Canvas.discardActiveObject().renderAll();
         }
 
-
-
         _Canvas.on("object:modified", function (obj) {
             Canvas("update_data")
         })
-
-
-
-        window.corsDisconnect = function () {
-
-            PopupAlert({
-                title: "連接到代理伺服器時發生錯誤",
-                body: `
-                                <h1 class="text-primary">: (</h1>
-                <span class="text-secondary">目前無法連接至代理伺服器(cors-helper.onrender.com)<br>你可能無法獲取圖片</span>
-                <p></p>
-                <div class="accordion">
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"  aria-expanded="false">
-                        可能原因
-                        </button>
-                    </h2>
-                    <div id="collapseOne" class="accordion-collapse collapse " data-bs-parent="#accordionExample">
-                        <div class="accordion-body">
-                        <ol>
-                            <li>沒有網路連線或連線品質不佳</li>    
-                            <li>伺服器發生故障</li>
-                            
-                        </ol>
-                        </div>
-                    </div>
-                    </div>
-                </div>`
-            })
-        }
-
 
         window.onerror = (sMessage, sUrl, sLine) => {
 
@@ -892,7 +953,224 @@
             })
         }
 
+        async function generateDOCX(filename, imgs, csv, num) {
+            var summery = $("#summery-" + num).val() == "" ? "新增說明" : $("#summery-" + num).val()
+            var content = `
+        <!DOCTYPE HTML><html><head></head><body>
+    <style>p.MsoNormal,li.MsoNormal,div.MsoNormal {margin: 0cm;
+    font-size: 12.0pt;font-family: "Calibri", sans-serif;}p {margin: 0;padding: 0}p.MsoHeader,li.MsoHeader,div.MsoHeader {
+    margin: 0cm;font-size: 10.0pt;font-family: "Calibri", sans-serif;}p.MsoFooter,li.MsoFooter,div.MsoFooter {
+    margin: 0cm;font-size: 10.0pt;font-family: "Calibri", sans-serif;}.MsoChpDefault {font-family: "Calibri", sans-serif;}
+    @page WordSection1 {size: 595.3pt 841.9pt;margin: 72.0pt 90.0pt 72.0pt 90.0pt;mso-header-margin: 42.55pt;mso-footer-margin: 49.6pt;
+    mso-paper-source: 0;layout-grid: 18.0pt;}img,img.img{width:5em !important;height:5em !important;}
+    </style>
+        <div class=WordSection1>
+            <p><h3>啟用編輯以查看完整圖片</h3></p>
+            <table style='margin-left:13.95pt;border-collapse:collapse;border:none;'>
+                <tr>
+                    <td width=113 valign=top style='width:3.0cm;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+                        <p><span>
+                                <o:p>&nbsp;</o:p>
+                            </span></p>
+                    </td>
+                    <td width=194 valign=top
+                        style='width:145.8pt;border:solid windowtext 1.0pt;border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+                        <p><span style='font-family:"新細明體",serif;'>北極</span><span>
+                                <o:p></o:p>
+                            </span></p>
+                    </td>
+                    <td width=198 valign=top
+                        style='width:148.85pt;border:solid windowtext 1.0pt;border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+                        <p><span style='font-family:"新細明體",serif;'>南極</span><span>
+                                <o:p></o:p>
+                            </span></p>
+                    </td>
+                </tr>
+                <tr style='height:129.5pt'>
+                    <td width=113 rowspan=4 valign=top
+                        style='width:3.0cm;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:129.5pt'>
+                        <p><span style='font-family:"新細明體",serif;'>日期時間</span><span>
+                                <o:p></o:p>
+                            </span></p>
+                        <p><b><span>${$("#data-filename-" + imgs.Nimg.split("-")[1]).attr('data-filename').split("_")[0]}<o:p></o:p></span></b></p>
+                        <p><b><span>${$("#data-filename-" + imgs.Nimg.split("-")[1]).attr('data-filename').split("_")[1].split(".")[0]}</span></b><span>
+                                <o:p></o:p>
+                            </span></p>
+                    </td>
+                    <td width=194 valign=top
+                        style='width:145.8pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:129.5pt'>
+                        <p><span class=SpellE><span class=GramE><span><img width=189 height=189 class=img src="${await imageToDataURL($("#" + imgs.Nimg).attr('src'))}" alt="北極" style='width:5cm !important;height:5cm !important;'/></span></span></span><span>
+                                <o:p></o:p>
+                            </span></p>
+                    </td>
+                    <td width=198 valign=top
+                        style='width:148.85pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:129.5pt'>
+                        <p><span class=SpellE><span><img width=189 height=189 class=img src="${await imageToDataURL($("#" + imgs.Simg).attr('src'))}" alt="南極" style='width:5cm !important;height:5cm !important;'/></span></span><span>
+                                <o:p></o:p>
+                            </span></p>
+                    </td>
+                </tr>
+                <tr style='height:21.0pt'>
+                    <td width=194 valign=top
+                        style='width:145.8pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:21.0pt'>
+                        <p><span class=GramE><span style='font-family:"新細明體",serif;'>疊圖</span></span><span>
+                                <o:p></o:p>
+                            </span></p>
+                    </td>
+                    <td width=198 valign=top
+                        style='width:148.85pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:21.0pt'>
+                        <p><span style='font-family:"新細明體",serif;'>資料</span><span>
+                                <o:p></o:p>
+                            </span></p>
+                    </td>
+                </tr>
+                <tr style='height:27.75pt'>
+                    <td width=194 rowspan=2 valign=top
+                        style='width:145.8pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:27.75pt'>
+                        <p><span class=SpellE><span class=GramE><img width=189 height=189 class=img src="${$("#" + imgs.main_img).attr('src')}" style='width:5cm !important;height:5cm !important;'/></span></p>
+                    </td>
+                    <td width=198 valign=top
+                        style='width:148.85pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:27.75pt'>
+                        <p><span style='font-family:"新細明體",serif;'>角度</span><span>(</span><span
+                                style='font-family:"新細明體",serif;'>相對於底圖</span><span>)<o:p></o:p></span></p>
+                        <p><b><span
+                                    style='font-family:"Segoe UI",sans-serif;color:#212529;background:white'>${csv[1][9]}</span></b><span
+                                style='font-family:"新細明體",serif;'>度</span><span>
+                                <o:p></o:p>
+                            </span></p>
+                    </td>
+                </tr>
+                <tr style='height:83.9pt'>
+                    <td width=198 valign=top
+                        style='width:148.85pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:83.9pt'>
+                        <p><span style='font-family:"新細明體",serif;'>座標</span><span>(</span><span
+                                style='font-family:"新細明體",serif;'>相對於底圖</span><span>)<o:p></o:p></span></p>
+                        <p><span style='font-family:"新細明體",serif;'>左上</span> <b><span
+                                    style='font-family:"Segoe UI",sans-serif;color:#212529;background:white'>(${csv[2][1].toFixed(2)},${csv[2][2].toFixed(2)})</span></b><span>
+                                <o:p></o:p>
+                            </span></p>
+                        <p><span style='font-family:"新細明體",serif;'>左下</span> <b><span
+                                    style='font-family:"Segoe UI",sans-serif;color:#212529;background:white'>(${csv[2][5].toFixed(2)},${csv[2][6].toFixed(2)})</span></b><span>
+                                <o:p></o:p>
+                            </span></p>
+                        <p><span style='font-family:"新細明體",serif;'>右上</span> <b><span
+                                    style='font-family:"Segoe UI",sans-serif;color:#212529;background:white'>(${csv[2][3].toFixed(2)},${csv[2][4].toFixed(2)})</span><span>
+                                    <o:p></o:p>
+                                </span></b></p>
+                        <p><span style='font-family:"新細明體",serif;'>右下</span> <b><span
+                                    style='font-family:"Segoe UI",sans-serif;color:#212529;background:white'>(${csv[2][7].toFixed(2)},${csv[2][8].toFixed(2)})</span><span>
+                                <o:p></o:p>
+                            </span></b></p>
+                    </td>
+                </tr>
+                <tr style='height:34.95pt'>
+                    <td width=113 valign=top
+                        style='width:3.0cm;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt;height:34.95pt'>
+                        <p><span style='font-family:"新細明體",serif;'>說明</span><span>
+                                <o:p></o:p>
+                            </span></p>
+                    </td>
+                    <td width=393 colspan=2 valign=top
+                        style='width:294.65pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt;height:34.95pt'>
+                        <p><span><o:p>${summery}</o:p></span></p>
+                    </td>
+                </tr>
+            </table>
+            <p>&nbsp;</p>
+            <p>詳細資料</p>
+            <table>
+            <thead>
+                <tr>
+                    <td>圖層</td>
+                    <td>左上X</td>
+                    <td>左上Y</td>
+                    <td>右上X</td>
+                    <td>右上Y</td>
+                    <td>左下X</td>
+                    <td>左下Y</td
+                    <td>右下X</td>
+                    <td>右下Y</td>
+                    <td>角度</td>
+                </tr>
+            </thead>    
+            <tbody>
+                <tr>
+                    <td>${csv[1][0]}</td>
+                    <td>${csv[1][1]}</td>
+                    <td>${csv[1][2]}</td>
+                    <td>${csv[1][3]}</td>
+                    <td>${csv[1][4]}</td>
+                    <td>${csv[1][5]}</td>
+                    <td>${csv[1][6]}</td>
+                    <td>${csv[1][7]}</td>
+                    <td>${csv[1][8]}</td>
+                    <td>${csv[1][9]}</td>
+                </tr>
+                <tr>
+                    <td>${csv[2][0]}</td>
+                    <td>${csv[2][1]}</td>
+                    <td>${csv[2][2]}</td>
+                    <td>${csv[2][3]}</td>
+                    <td>${csv[2][4]}</td>
+                    <td>${csv[2][5]}</td>
+                    <td>${csv[2][6]}</td>
+                    <td>${csv[2][7]}</td>
+                    <td>${csv[2][8]}</td>
+                    <td>${csv[2][9]}</td>
+                </tr>
+            </tbody>
+            </table>
+            <p><span>
+                    <o:p>建立時間:${getTime("pack").year}/${getTime("pack").month}/${getTime("pack").date} &nbsp; ${getTime("pack").hour}:${getTime("pack").minute}:${getTime("pack").second}</o:p>
+                </span></p>
+    
+        </div>
+    </body>
+    
+    </html`
 
+
+            var convertedDoc = htmlDocx.asBlob(content, { orientation: "Portrait" });
+            saveAs(convertedDoc, filename );
+            // Export2Word("export-doc")
+        }
+
+
+        function Export2Word(element, filename = 'test506') {
+            var preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+            var postHtml = "</body></html>";
+            var html = preHtml + document.getElementById(element).innerHTML + postHtml;
+
+            var blob = new Blob(['\ufeff', html], {
+                type: 'application/msword'
+            });
+
+            // Specify link url
+            var url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+
+            // Specify file name
+            filename = filename ? filename + '.doc' : 'document.doc';
+
+            // Create download link element
+            var downloadLink = document.createElement("a");
+
+            document.body.appendChild(downloadLink);
+
+            if (navigator.msSaveOrOpenBlob) {
+                navigator.msSaveOrOpenBlob(blob, filename);
+            } else {
+                // Create a link to the file
+                downloadLink.href = url;
+
+                // Setting the file name
+                downloadLink.download = filename;
+
+                //triggering the function
+                downloadLink.click();
+            }
+
+            document.body.removeChild(downloadLink);
+        }
     </script>
 </body>
 
