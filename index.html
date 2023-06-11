@@ -101,20 +101,40 @@
         <div style="width: 50%;padding-right: 25px;">
             <div id="data-input">
                 <h2>1. 輸入資料</h2>
-                <div class="d-flex">
-                    <input type="date" name="" id="date-input" onchange="date = this.value" class="form-control"><span
-                        style="user-select: none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                    <input type="time" name="" id="time-input" class="form-control"
-                        onchange="time = this.value.split(':')[0]+this.value.split(':')[1]"><span
-                        style="user-select: none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                    <select id="place-input" class="form-select">
-                        <option value="N">北極</option>
-                        <option value="S">南極</option>
-                    </select>
+                <p>從線上取得，或從裝置上傳圖片</p>
 
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
+                    <label class="form-check-label" for="flexRadioDefault1">
+                        <div class="d-flex me-1">
+                            <input type="date" name="" id="date-input"
+                                onchange="date = this.value;$('#flexRadioDefault1').attr('checked','checked')"
+                                class="form-control me-1" onfocus="$('#flexRadioDefault1').attr('checked','checked')">
+                            <input type="time" name="" id="time-input" class="form-control me-1"
+                                onchange="time = this.value.split(':')[0]+this.value.split(':')[1];$('#flexRadioDefault1').attr('checked','checked')"
+                                onfocus="$('#flexRadioDefault1').attr('checked','checked')">
+                            <select id="place-input" class="form-select me-1"
+                                onchange="$('#flexRadioDefault1').attr('checked','checked')"
+                                onfocus="$('#flexRadioDefault1').attr('checked','checked')">
+                                <option value="N">北極</option>
+                                <option value="S">南極</option>
+                            </select>
+                        </div>
+                    </label>
                 </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                    <label class="form-check-label" for="flexRadioDefault2">
+                        <div class="d-flex mt-1">
+                            <input type="file" id="input-file" accept="image/*" multiple
+                                onchange="$('#flexRadioDefault2').attr('checked','checked')"
+                                onfocus="$('#flexRadioDefault2').attr('checked','checked')">
+                        </div>
+                    </label>
+                </div>
+
                 <p></p>
-                <button class="btn btn-primary" onclick="Img('get')">送出</button>
+                <button class="btn btn-primary" onclick="Img('get')">確定</button>
 
             </div>
 
@@ -129,8 +149,7 @@
 
             <hr>
             <h2>4.資料顯示</h2>
-            <p>按下資料夾圖示以展開檔案內容<br>下載後的csv檔案是亂碼?參考<a href="https://www.managertoday.com.tw/articles/view/55615?"
-                    target="_blank">這篇</a>教學</p>
+            <p>按下資料夾圖示以展開檔案內容</p>
             <div id="output-display">
 
                 <span id="output-placeholder">已經導出的資料<wbr>會顯示在這裡</span>
@@ -264,7 +283,7 @@
         </div>
     </div>
 
-    <div id="export-doc"></div>
+    <div id="processing-file" hidden></div>
 
     <!--------------------------SCRIPT.LIB----------------------------->
 
@@ -279,6 +298,8 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.js'
         integrity='sha512-q7T9VUu0gBgAGV3YkcvI0wjeBJONO5Cg/+688NkDC6qupjUvEG9ZmNK4GjZWvWuuT1VIjS0abwE1IKXVew8Ohw=='
         crossorigin='anonymous'></script>
+
+    <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"
         integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ=="
@@ -343,11 +364,63 @@
 
                         return par
                     }
+
+        }
+        function _readURL(input) {
+            if (input.files && input.files.length >= 0) {
+                for (var i = 0; i < input.files.length; i++) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        console.log(e)
+                        // $("#upload-file-preview").html(`<img src="${e.target.result}" width=200 />`)
+                        imgCount++; activeImg++;
+                        //    console.log(img)
+                        //  $(`#img-${imgCount}`).attr('src',e.target.result)
+
+                        $("#data-display").append(`
+<div class="data-item" id="data-${imgCount}">
+<div class="d-flex">
+    <div class="data-image" id="img-container-${imgCount}">
+    <img alt='無法取得資料' id='img-${imgCount}' src='${e.target.result}' onerror="Img('error',{'id':'img-${imgCount}','num':${imgCount}})"></div>
+    <div style="padding: 5px;">
+
+        <div class="btn-group" role="group" aria-label="toolbar">
+            <button type="button" class="btn btn-primary" id='download-${imgCount}' onclick="Img('dl',{'id':'img-${imgCount}','num':${imgCount}})">
+                <i class="bi bi-download"></i>
+            </button>
+            <button type="button" class="btn btn-danger" onclick="Img('del',{'id':'data-${imgCount}','num':${imgCount}})">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+        <br>
+        <span data-from="" id="data-from-${imgCount}">上傳的檔案</span>
+        <br>
+        <span id="data-filename-${imgCount}" data-filename="${input.files[0].name}">${input.files[0].name}</span>
+        <br>
+        <span class='text-secondary'>圖片 #${imgCount}</span>
+    </div>
+</div>
+</div>
+`)
+                        $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
+                        $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
+
+                    }
+                    reader.readAsDataURL(input.files[i]);
+                }
+
+
+
+
+            } else {
+                PopupAlert({ 'title': '請選擇圖片', 'body': '你沒有選擇要上傳的圖片檔案!', 'escCallBack': 'x', 'enterCallBack': 'dismiss' })
+            }
         }
 
 
         var imgCount = 0, activeImg = 0, errorImgArr = [], imgNums = [], imgData = [];
         function Img(type, par) {
+
             console.log({ "type": type, "par": par })
 
             if (type == 'download' || type == 'dl') {
@@ -360,27 +433,27 @@
                 PopupAlert({ title: '確定刪除圖片?', body: '刪除之後無法復原', escCallBack: 'dismiss', enterCallBack: `$('#${par.id}').remove();$('.cvs-select-${par.num}').remove();activeImg--;removeElementFromArray(imgNums,"${par.num}");if(activeImg==0){$('#data-display').append('<span id=img-placeholder>已經取得的圖片<wbr>會顯示在這裡</span>')}` })
             }
             else if (type == 'get') {
+                if (document.getElementById("flexRadioDefault1").checked) {
+                    if (!date == '' && !time == '') {
 
-                if (!date == '' && !time == '') {
+                        if (time % 5 !== 0) {
+                            PopupAlert({ 'title': '注意', 'body': '資料間隔為5分鐘，例:<br>12:00 , 15:50 , 01:25<br>請重新輸入資料', 'escCallBack': 'x', 'enterCallBack': 'dismiss' })
 
-                    if (time % 5 !== 0) {
-                        PopupAlert({ 'title': '注意', 'body': '資料間隔為5分鐘，例:<br>12:00 , 15:50 , 01:25<br>請重新輸入資料', 'escCallBack': 'x', 'enterCallBack': 'dismiss' })
-
-                    } else {
-                        imgCount++; activeImg++;
-                        let place;
-                        //new server:https://services.swpc.noaa.gov/images/animations/ovation/north/aurora_N_2023-01-09_2030.jpg
-                        //https://cors-helper-2.onrender.com/           https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_2023-01-09_0805.jpg
-
-                        if ($("#place-input").val() == "N") {
-                            url = `https://services.swpc.noaa.gov/images/animations/ovation/north/aurora_N_${date}_${time}.jpg`
-                            place = '北極'
                         } else {
-                            place = '南極'
-                            url = `https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_${date}_${time}.jpg`
-                        }
-                        $("#img-placeholder").remove()
-                        $("#data-display").append(`
+                            imgCount++; activeImg++;
+                            let place;
+                            //new server:https://services.swpc.noaa.gov/images/animations/ovation/north/aurora_N_2023-01-09_2030.jpg
+                            //https://cors-helper-2.onrender.com/           https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_2023-01-09_0805.jpg
+
+                            if ($("#place-input").val() == "N") {
+                                url = `https://services.swpc.noaa.gov/images/animations/ovation/north/aurora_N_${date}_${time}.jpg`
+                                place = '北極'
+                            } else {
+                                place = '南極'
+                                url = `https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_${date}_${time}.jpg`
+                            }
+                            $("#img-placeholder").remove()
+                            $("#data-display").append(`
                 
                 <div class="data-item" id="data-${imgCount}">
                     <div class="d-flex">
@@ -411,24 +484,27 @@
                 </div>
 
                 `)
-                        $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
-                        //    imgData.push([])
-                        $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
+                            $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
+                            //    imgData.push([])
+                            $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
 
+                        }
+                    } else {
+                        let html = ''
 
+                        if (date == undefined) {
+                            html = html + `日期:<input type="date" class="form-control " disabled >`
+                        }
+                        if (time == undefined) {
+
+                            html = html + `時間:<input type="time" class="form-control " disabled >`
+                        }
+                        console.log(html)
+                        PopupAlert({ title: '請輸入完整資料', body: `請檢查以下資料<p></p><div >${html}</div>`, escCallBack: 'x', enterCallBack: 'dismiss' })
                     }
-                } else {
-                    let html = ''
-
-                    if (date == undefined) {
-                        html = html + `日期:<input type="date" class="form-control " disabled >`
-                    }
-                    if (time == undefined) {
-
-                        html = html + `時間:<input type="time" class="form-control " disabled >`
-                    }
-                    console.log(html)
-                    PopupAlert({ title: '請輸入完整資料', body: `請檢查以下資料<p></p><div >${html}</div>`, escCallBack: 'x', enterCallBack: 'dismiss' })
+                }
+                else {
+                    _readURL(document.getElementById("input-file"))
                 }
             }
             else if (type == "error") {
@@ -694,8 +770,8 @@
                         type="button" class="btn btn-danger"
                         onclick="Data('del','outData-container-${dataCount}','csv')"><i
                             class="bi bi-trash"></i></button></div><br><span id="csv-${dataCount}"
-                    data-fileName="${text}.csv">${text}</span><br><span class='text-secondary'>資料組
-                    #${dataCount}</span><br><span class='text-secondary'>CSV檔案</span>
+                    data-fileName="${text}.xlsx">${text}</span><br><span class='text-secondary'>資料組
+                    #${dataCount}</span><br><span class='text-secondary'>XLSX檔案</span>
             </div>
         </div>
     </div>
@@ -731,9 +807,24 @@
                 if (par2 == "image") {
 
                 } else if (par2 == "csv") {
-                    exportToCsv($(`#csv-${par}`).attr("data-filename"),
-                        dataSet[fileIDArr.indexOf("csv-" + par)].csv
-                    )
+                    //exportToCsv($(`#csv-${par}`).attr("data-filename"),
+                    //    dataSet[fileIDArr.indexOf("csv-" + par)].csv
+                    //)
+
+                    var process_text = `<table id="tbl_exporttable_to_xls">`;
+
+                    for (i = 0; i < dataSet[fileIDArr.indexOf("csv-" + par)].csv.length; i++) {
+                        process_text = process_text + "<tr>"
+                        for (j = 0; j < dataSet[fileIDArr.indexOf("csv-" + par)].csv[i].length; j++) {
+                            process_text = process_text + `<td>${dataSet[fileIDArr.indexOf("csv-" + par)].csv[i][j]}</td>`
+                        }
+                        process_text = process_text + "</tr>"
+                    }
+                    process_text = process_text + "</table>"
+                    $("#processing-file").html(process_text)
+                    ExportToExcel('xlsx', $(`#csv-${par}`).attr("data-filename"))
+                    $("#processing-file").html("")
+
                 } else if (par2 == "docx") {
                     console.log(dataSet[fileIDArr.indexOf("csv-" + par)])
                     generateDOCX($(`#docx-${par}`).attr("data-filename"), dataSet[fileIDArr.indexOf("csv-" + par)].docx, dataSet[fileIDArr.indexOf("csv-" + par)].csv, par)
@@ -780,6 +871,31 @@
                     document.body.removeChild(link);
                 }
             }
+        }
+
+        function ExportToExcel(type, fn, dlo5) {
+
+            var wb = XLSX.utils.table_to_book(document.getElementById('tbl_exporttable_to_xls'), { sheet: "疊圖分析資料" });
+
+            var wbout = XLSX.write(wb, { bookType: type, bookSST: true, type: 'binary' })
+
+            XLSX.writeFile(wb, fn || ('MySheetName.' + (type || 'xlsx')));
+            function s2ab(s) {
+                var buf = new ArrayBuffer(s.length);
+                var view = new Uint8Array(buf);
+                for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+                return buf;
+            }
+
+           // saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), 'test.xlsx');
+
+
+
+            // var elt = document.getElementById('tbl_exporttable_to_xls');
+            // var wb = XLSX.utils.table_to_book(elt, { sheet: "sheet1" });
+            // return dl ?
+            // XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }) :
+            // XLSX.writeFile(wb, fn || ('MySheetName.' + (type || 'xlsx')));
         }
 
         //  {title, body, escCallBack, enterCallBack, closeButtonStatue}
@@ -965,7 +1081,7 @@
     mso-paper-source: 0;layout-grid: 18.0pt;}img,img.img{width:5em !important;height:5em !important;}
     </style>
         <div class=WordSection1>
-            <p><h3>啟用編輯以查看完整圖片</h3></p>
+            <p><h3>啟用編輯以查看完整圖片<br>此處資料經四捨五入，詳細資料數值請參考XLSX檔案</h3></p>
             <table style='margin-left:13.95pt;border-collapse:collapse;border:none;'>
                 <tr>
                     <td width=113 valign=top style='width:3.0cm;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
@@ -1034,7 +1150,7 @@
                         <p><span style='font-family:"新細明體",serif;'>角度</span><span>(</span><span
                                 style='font-family:"新細明體",serif;'>相對於底圖</span><span>)<o:p></o:p></span></p>
                         <p><b><span
-                                    style='font-family:"Segoe UI",sans-serif;color:#212529;background:white'>${csv[2][9]}</span></b><span
+                                    style='font-family:"Segoe UI",sans-serif;color:#212529;background:white'>${csv[2][9].toFixed(2)}</span></b><span
                                 style='font-family:"新細明體",serif;'>度</span><span>
                                 <o:p></o:p>
                             </span></p>
@@ -1087,7 +1203,7 @@
 
 
             var convertedDoc = htmlDocx.asBlob(content, { orientation: "Portrait" });
-            saveAs(convertedDoc, filename );
+            saveAs(convertedDoc, filename);
             // Export2Word("export-doc")
         }
 
