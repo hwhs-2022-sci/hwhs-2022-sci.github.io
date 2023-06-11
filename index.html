@@ -376,6 +376,18 @@
                         imgCount++; activeImg++;
                         //    console.log(img)
                         //  $(`#img-${imgCount}`).attr('src',e.target.result)
+                        var theFileName=input.files[i].name
+                    if(theFileName.includes("_")){
+                        if(!theFileName.includes(":")){
+                           let t = theFileName.split("_")
+                            //2023-03-11_02_00_北極.png -> the old file name
+                            //2023-06-10_21":"40_北極.png => new one(NOAA)
+                            theFileName = t[0]+"_"+t[1]+":"+t[2]+"_"+t[3]
+                        }
+                    }else{
+                        alert("無法辨識檔案名稱:"+theFileName)
+                    }
+
 
                         $("#data-display").append(`
 <div class="data-item" id="data-${imgCount}">
@@ -395,7 +407,7 @@
         <br>
         <span data-from="" id="data-from-${imgCount}">上傳的檔案</span>
         <br>
-        <span id="data-filename-${imgCount}" data-filename="${input.files[0].name}">${input.files[0].name}</span>
+        <span id="data-filename-${imgCount}" data-filename="${input.files[i].name}">${input.files[i].name}</span>
         <br>
         <span class='text-secondary'>圖片 #${imgCount}</span>
     </div>
@@ -403,11 +415,11 @@
 </div>
 `)
                         $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
+                        $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
 
                     }
                     reader.readAsDataURL(input.files[i]);
                 }
-                $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
 
 
 
@@ -785,7 +797,9 @@
                         onclick="Data('del','outData-container-${dataCount}','docx')"><i
                         class="bi bi-trash"></i></button></div><br><span id="docx-${dataCount}"
                     data-fileName="${text}.docx">${text}</span><br><span class='text-secondary'>資料組
-                    #${dataCount}</span><br><span class='text-secondary'>DOCX檔案 - 表格整理<br><textarea id="summery-${dataCount}" placeholder="新增說明..." style="height: 38px;"></textarea></span>
+                    #${dataCount}</span><br><span class='text-secondary'>DOCX檔案 - 表格整理
+                        <br>模板:<select id="template-${dataCount}"><option value="A">同時不同地</option><option value="B">同地不同時</option></select>
+                        <br><textarea id="summery-${dataCount}" placeholder="新增說明..." style="height: 38px;"></textarea></span>
             </div>
         </div>
     </div>
@@ -794,7 +808,7 @@
             } else if (type == "del") {
                 PopupAlert({
                     title: '確定刪除資料?',
-                    body: '刪除之後無法復原',
+                    body: '刪除之後無法復原<br>如果刪除圖片，<b>將無法生成表格整理(.docx檔案)!</b>',
                     escCallBack: 'dismiss',
                     enterCallBack: `$('#${par}-${par2}').remove();if($('#${par}').html() == ""){activeData--;$("#${par}-toggle").remove()}if(activeData==0){$('#output-display').append('<span id=output-placeholder>已經導出的資料<wbr>會顯示在這裡</span>')}`
                 })
@@ -1067,6 +1081,13 @@
 
         async function generateDOCX(filename, imgs, csv, num) {
             var summery = $("#summery-" + num).val() == "" ? "新增說明" : $("#summery-" + num).val()
+            var textArr = []
+            if($("#template-"+num).val() == "A"){
+                textArr.push("北極")
+                textArr.push("南極")
+            }else{
+                
+            }
             var content = `
         <!DOCTYPE HTML><html><head></head><body>
     <style>p.MsoNormal,li.MsoNormal,div.MsoNormal {margin: 0cm;
