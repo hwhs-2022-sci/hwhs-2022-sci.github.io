@@ -1188,7 +1188,9 @@
                     </td>
                 </tr>
             </table>
-            <p>使用到的圖片:<br>1.${$("#data-filename-" + imgs.Nimg.split("-")[1]).attr('data-filename')}<br>2.${$("#data-filename-" + imgs.Simg.split("-")[1]).attr('data-filename')}</p>
+            <p></p>
+            <p>使用到的圖片:<br>${$("#data-filename-" + imgs.Nimg.split("-")[1]).attr('data-filename')}<br>${$("#data-filename-" + imgs.Simg.split("-")[1]).attr('data-filename')}</p>
+            <p></p>
             <p><span>
                     <o:p>建立時間:${getTime("pack").year}/${getTime("pack").month}/${getTime("pack").date} &nbsp;${getTime("pack").hour}:${getTime("pack").minute}:${getTime("pack").second}</o:p>
                 </span></p>
@@ -1196,7 +1198,7 @@
         </div>
     </body>
     
-    </html`
+    </html>`
 
 
             var convertedDoc = htmlDocx.asBlob(content, { orientation: "Portrait" });
