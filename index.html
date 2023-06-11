@@ -370,24 +370,28 @@
             if (input.files && input.files.length >= 0) {
                 for (var i = 0; i < input.files.length; i++) {
                     var reader = new FileReader();
+                    var theFileName = input.files[i].name
+
+                    if (theFileName.includes("_")) {
+                        if (!theFileName.includes(":")) {
+                            let t = theFileName.split("_")
+                            //2023-03-11_02_00_北極.png -> the old file name
+                            //2023-06-10_21":"40_北極.png => new one(NOAA)
+                            theFileName = t[0] + "_" + t[1] + ":" + t[2] + "_" + t[3]
+                        }
+                    } else {
+                        PopupAlert({ 'title': '檔案名稱無效', 'body': '無法辨識檔案名稱:' + theFileName + '<br>這將導致系統無法處理你的資料<br>已略過此檔案', 'escCallBack': 'x', 'enterCallBack': 'dismiss' })
+                        continue;
+                    }
+
                     reader.onload = function (e) {
                         console.log(e)
+
                         // $("#upload-file-preview").html(`<img src="${e.target.result}" width=200 />`)
                         imgCount++; activeImg++;
                         //    console.log(img)
                         //  $(`#img-${imgCount}`).attr('src',e.target.result)
-                        var theFileName=input.files[i].name
-                    if(theFileName.includes("_")){
-                        if(!theFileName.includes(":")){
-                           let t = theFileName.split("_")
-                            //2023-03-11_02_00_北極.png -> the old file name
-                            //2023-06-10_21":"40_北極.png => new one(NOAA)
-                            theFileName = t[0]+"_"+t[1]+":"+t[2]+"_"+t[3]
-                        }
-                    }else{
-                        alert("無法辨識檔案名稱:"+theFileName)
-                    }
-
+                        //console.log(input.files[i])
 
                         $("#data-display").append(`
 <div class="data-item" id="data-${imgCount}">
@@ -407,7 +411,7 @@
         <br>
         <span data-from="" id="data-from-${imgCount}">上傳的檔案</span>
         <br>
-        <span id="data-filename-${imgCount}" data-filename="${input.files[i].name}">${input.files[i].name}</span>
+        <span id="data-filename-${imgCount}" data-filename="${theFileName}">${theFileName}</span>
         <br>
         <span class='text-secondary'>圖片 #${imgCount}</span>
     </div>
@@ -897,7 +901,7 @@
                 return buf;
             }
 
-           // saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), 'test.xlsx');
+            // saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), 'test.xlsx');
 
 
 
@@ -938,6 +942,8 @@
         function PopupAlert(par) {
             console.log(par)
             let _Modal = new bootstrap.Modal(document.getElementById('Modal'));
+            _Modal.hide();
+
             $('.modal-title').html('');
             $('.modal-body').html('');
             $('#modal-esc-btn').removeAttr('onclick');
@@ -977,7 +983,9 @@
 
 
         }
-
+        document.getElementById('Modal').addEventListener('hidden.bs.modal', event => {
+            $("body").css("overflow-y", "scroll")
+        })
         //////**********************************//////
         async function imageToDataURL(imageUrl) {
             console.log(imageUrl)
@@ -1082,11 +1090,23 @@
         async function generateDOCX(filename, imgs, csv, num) {
             var summery = $("#summery-" + num).val() == "" ? "新增說明" : $("#summery-" + num).val()
             var textArr = []
-            if($("#template-"+num).val() == "A"){
+
+            if ($("#template-" + num).val() == "A") {
                 textArr.push("北極")
                 textArr.push("南極")
-            }else{
-                
+                if ($("#data-filename-" + imgs.Nimg.split("-")[1]).attr('data-filename').includes("南極") || $("#data-filename-" + imgs.Simg.split("-")[1]).attr('data-filename').includes("北極")) {
+                    var temp = [imgs.Nimg,imgs.Simg]
+                    imgs.Simg = temp[0]
+                    imgs.Nimg = temp[1]
+                }//南北換
+            } else {
+                if ($("#data-filename-" + imgs.Nimg.split("-")[1]).attr('data-filename').includes("北")) {
+                    textArr.push("北極")
+                    textArr.push("北極")
+                } else {
+                    textArr.push("南極")
+                    textArr.push("南極")
+                }
             }
             var content = `
         <!DOCTYPE HTML><html><head></head><body>
