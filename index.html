@@ -370,14 +370,14 @@
                         imgCount++; activeImg++;
                         let place;
                         //new server:https://services.swpc.noaa.gov/images/animations/ovation/north/aurora_N_2023-01-09_2030.jpg
-                        //           https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_2023-01-09_0805.jpg
+                        //https://cors-helper-2.onrender.com/           https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_2023-01-09_0805.jpg
 
                         if ($("#place-input").val() == "N") {
-                            url = `https://cors-helper-2.onrender.com/https://services.swpc.noaa.gov/images/animations/ovation/north/aurora_N_${date}_${time}.jpg`
+                            url = `https://services.swpc.noaa.gov/images/animations/ovation/north/aurora_N_${date}_${time}.jpg`
                             place = '北極'
                         } else {
                             place = '南極'
-                            url = `https://cors-helper-2.onrender.com/https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_${date}_${time}.jpg`
+                            url = `https://services.swpc.noaa.gov/images/animations/ovation/south/aurora_S_${date}_${time}.jpg`
                         }
                         $("#img-placeholder").remove()
                         $("#data-display").append(`
