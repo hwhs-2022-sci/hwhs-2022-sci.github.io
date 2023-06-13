@@ -1020,16 +1020,29 @@
 
             for (let i = 0; i < data.length; i++) {
 
-                var img_element = document.querySelector("#img-" + data[i]),
-                    img_draw = new fabric.Image(img_element, {
-                        name: `第 ${i} 層`,
-                        top: 50,
-                        left: 50,
-                        inverted: true,
-                        opacity: (Math.abs(1 - alpha[i] / 100))
-                    });
+                var img_element = await imageToDataURL($("#img-" + data[i]).attr("src"));
+
+                  //  img_draw = new fabric.Image(img_element, {
+                   //     name: `第 ${i} 層`,
+                  //      top: 50,
+                   //     left: 50,
+                   //     inverted: true,
+                     //   opacity: (Math.abs(1 - alpha[i] / 100))
+                  //  });
+
+                fabric.Image.fromURL(img_element, function (img) {
+                    img.name= `第 ${i} 層`
+                    img.top= 50;
+                    img.left= 50;
+                    _Canvas.add(img);
+                    img.bringToFront();
+                    c = null;
+                    $('#_temp_canvas').remove();
+                    _Canvas.renderAll();
+                });
+
                 console.log(img_element)
-                _Canvas.add(img_draw)
+               // _Canvas.add(img_draw)
                 Canvas("update_data")
             }
         }
@@ -1095,7 +1108,7 @@
                 textArr.push("北極")
                 textArr.push("南極")
                 if ($("#data-filename-" + imgs.Nimg.split("-")[1]).attr('data-filename').includes("南極") || $("#data-filename-" + imgs.Simg.split("-")[1]).attr('data-filename').includes("北極")) {
-                    var temp = [imgs.Nimg,imgs.Simg]
+                    var temp = [imgs.Nimg, imgs.Simg]
                     imgs.Simg = temp[0]
                     imgs.Nimg = temp[1]
                 }//南北換
@@ -1282,6 +1295,43 @@
             }
 
             document.body.removeChild(downloadLink);
+        }
+
+
+
+        function recolorImage(img, oldRed, oldGreen, oldBlue, newRed, newGreen, newBlue) {
+
+            var c = document.createElement('canvas');
+            var ctx = c.getContext("2d");
+            var w = img.width;
+            var h = img.height;
+
+            c.width = w;
+            c.height = h;
+
+            // draw the image on the temporary canvas
+            ctx.drawImage(img, 0, 0, w, h);
+
+            // pull the entire image into an array of pixel data
+            var imageData = ctx.getImageData(0, 0, w, h);
+
+            // examine every pixel, 
+            // change any old rgb to the new-rgb
+            for (var i = 0; i < imageData.data.length; i += 4) {
+                // is this pixel the old rgb?
+                if (imageData.data[i] == oldRed && imageData.data[i + 1] == oldGreen && imageData.data[i + 2] == oldBlue) {
+                    // change to your new rgb
+                    imageData.data[i] = newRed;
+                    imageData.data[i + 1] = newGreen;
+                    imageData.data[i + 2] = newBlue;
+                }
+            }
+            // put the altered data back on the canvas  
+            ctx.putImageData(imageData, 0, 0);
+            // put the re-colored image back on the image
+            // var img1 = document.getElementById("image1");
+            return c.toDataURL('image/png');
+
         }
     </script>
 </body>
