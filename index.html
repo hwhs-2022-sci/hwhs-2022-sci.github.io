@@ -104,8 +104,10 @@
                 <p>從線上取得，或從裝置上傳圖片</p>
 
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
-                    <label class="form-check-label" for="flexRadioDefault1">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked
+                        onclick="$('#img-setting-alert-1').hide();$('#img-setting-switch-1').removeAttr('disabled')">
+                        
+                        <label onclick="$('#img-setting-alert-1').hide();$('#img-setting-switch-1').removeAttr('disabled')" class="form-check-label"  for="flexRadioDefault1">
                         <div class="d-flex me-1">
                             <input type="date" name="" id="date-input"
                                 onchange="date = this.value;$('#flexRadioDefault1').attr('checked','checked')"
@@ -123,16 +125,64 @@
                     </label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
-                    <label class="form-check-label" for="flexRadioDefault2">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" onclick="
+                                if(document.getElementById('input-file').files.length>1){
+                                    $('#img-setting-alert-1').show()
+                                    $('#img-setting-switch-1').attr('disabled','disabled')
+                                    document.getElementById('img-setting-switch-1').checked = false
+                                }else{
+                                    $('#img-setting-alert-1').hide()
+                                    $('#img-setting-switch-1').removeAttr('disabled')
+                                }
+                    
+                    ">
+                    <label class="form-check-label" for="flexRadioDefault2" onclick="
+                    if(document.getElementById('input-file').files.length>1){
+                        $('#img-setting-alert-1').show()
+                        $('#img-setting-switch-1').attr('disabled','disabled')
+                        document.getElementById('img-setting-switch-1').checked = false
+                    }else{
+                        $('#img-setting-alert-1').hide()
+                        $('#img-setting-switch-1').removeAttr('disabled')
+                    }">
                         <div class="d-flex mt-1">
-                            <input type="file" id="input-file" accept="image/*" multiple
-                                onchange="$('#flexRadioDefault2').attr('checked','checked')"
-                                onfocus="$('#flexRadioDefault2').attr('checked','checked')">
+                            <input type="file" id="input-file" accept="image/*" multiple onchange="$('#flexRadioDefault2').attr('checked','checked')
+                                if(this.files.length>1){
+                                    $('#img-setting-alert-1').show()
+                                    $('#img-setting-switch-1').attr('disabled','disabled')
+                                    document.getElementById('img-setting-switch-1').checked = false
+                                }else{
+                                    $('#img-setting-alert-1').hide()
+                                    $('#img-setting-switch-1').removeAttr('disabled')
+                                }
+                                " onfocus="$('#flexRadioDefault2').attr('checked','checked')">
                         </div>
                     </label>
                 </div>
-
+                <p></p>
+                <div class="card card-body">
+                    <div style="display: none;" class="alert alert-warning" id="img-setting-alert-1">選取超過1個檔案，無法進行此操作
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="img-setting-switch-1" onchange="
+                            if(this.checked){
+                                $('#img-setting-checkbox-1').removeAttr('disabled')
+                                $('#img-setting-select-1').removeAttr('disabled')
+                            }
+                            else{
+                                $('#img-setting-checkbox-1').attr('disabled','disabled')
+                                $('#img-setting-select-1').attr('disabled','disabled')
+                            }
+                        ">
+                        <label class="form-check-label" for="img-setting-switch-1">新增套色後的檔案</label>
+                    </div>
+                    選擇顏色: <select id="img-setting-select-1" disabled class="form-select form-control">
+                        <option value="red">紅</option>
+                        <option value="yellow">黃</option>
+                        <option value="green">綠</option>
+                        <option value="blue">藍</option>
+                    </select>
+                </div>
                 <p></p>
                 <button class="btn btn-primary" onclick="Img('get')">確定</button>
 
@@ -284,6 +334,7 @@
     </div>
 
     <div id="processing-file" hidden></div>
+    <div id="image-temp-container" data-count="0" hidden></div>
 
     <!--------------------------SCRIPT.LIB----------------------------->
 
@@ -309,6 +360,8 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script src="/html-docx.js"></script>
+
+
 
     <!--------------------------MAIN SCRIPT----------------------------->
 
@@ -366,42 +419,33 @@
                     }
 
         }
+        function delayMs(n) {
+            return new Promise(function (resolve) {
+                setTimeout(resolve, n);
+            });
+        }
         function _readURL(input) {
-            if (input.files && input.files.length >= 0) {
-                for (var i = 0; i < input.files.length; i++) {
-                    var reader = new FileReader();
+
+            if (!input.files.length) {
+                PopupAlert({ 'title': '請選擇圖片', 'body': '你沒有選擇要上傳的圖片檔案!', 'escCallBack': 'x', 'enterCallBack': 'dismiss' })
+            } else {
+
+                for (let i = 0; i < input.files.length; i++) {
+                    imgCount++; activeImg++;
+                    //    console.log(img)
+                    //  $(`#img-${imgCount}`).attr('src',e.target.result)
+                    //console.log(input.files[i])
+
                     var theFileName = input.files[i].name
-
-                    if (theFileName.includes("_")) {
-                        if (!theFileName.includes(":")) {
-                            let t = theFileName.split("_")
-                            //2023-03-11_02_00_北極.png -> the old file name
-                            //2023-06-10_21":"40_北極.png => new one(NOAA)
-                            theFileName = t[0] + "_" + t[1] + ":" + t[2] + "_" + t[3]
-                        }
-                    } else {
-                        PopupAlert({ 'title': '檔案名稱無效', 'body': '無法辨識檔案名稱:' + theFileName + '<br>這將導致系統無法處理你的資料<br>已略過此檔案', 'escCallBack': 'x', 'enterCallBack': 'dismiss' })
-                        continue;
-                    }
-
-                    reader.onload = function (e) {
-                        console.log(e)
-
-                        // $("#upload-file-preview").html(`<img src="${e.target.result}" width=200 />`)
-                        imgCount++; activeImg++;
-                        //    console.log(img)
-                        //  $(`#img-${imgCount}`).attr('src',e.target.result)
-                        //console.log(input.files[i])
-
-                        $("#data-display").append(`
+                    $("#data-display").append(`
 <div class="data-item" id="data-${imgCount}">
 <div class="d-flex">
     <div class="data-image" id="img-container-${imgCount}">
-    <img alt='無法取得資料' id='img-${imgCount}' src='${e.target.result}' onerror="Img('error',{'id':'img-${imgCount}','num':${imgCount}})"></div>
+    <img alt='無法取得資料' id='img-${imgCount}' src='' onerror="Img('error',{'id':'img-${imgCount}','num':${imgCount}})"></div>
     <div style="padding: 5px;">
 
         <div class="btn-group" role="group" aria-label="toolbar">
-            <button type="button" class="btn btn-primary" id='download-${imgCount}' onclick="Img('dl',{'id':'img-${imgCount}','num':${imgCount}})">
+            <button disabled type="button" class="btn btn-primary" id='download-${imgCount}' onclick="Img('dl',{'id':'img-${imgCount}','num':${imgCount}})">
                 <i class="bi bi-download"></i>
             </button>
             <button type="button" class="btn btn-danger" onclick="Img('del',{'id':'data-${imgCount}','num':${imgCount}})">
@@ -418,24 +462,100 @@
 </div>
 </div>
 `)
-                        $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
-                        $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
+                    $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
+                    $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
 
-                    }
-                    reader.readAsDataURL(input.files[i]);
+                    const img = document.getElementById(`img-${imgCount}`);
+                    img.src = URL.createObjectURL(input.files[i]);
+                    //img.height = 60;
+                    img.onload = async function () {
+                        //  URL.revokeObjectURL(img.src);
+                        await Img('loaded', { 'id': `img-${imgCount}`, 'num': imgCount })
+                    };
+                    //li.appendChild(img);
+
+                    //const info = document.createElement("span");
+                    //info.innerHTML = `${input.files[i].name}: ${input.files[i].size} bytes`;
+                    //li.appendChild(info);
                 }
-
-
-
-
-            } else {
-                PopupAlert({ 'title': '請選擇圖片', 'body': '你沒有選擇要上傳的圖片檔案!', 'escCallBack': 'x', 'enterCallBack': 'dismiss' })
             }
+
+
+
+
+
+
+
+            /*
+                        if (input.files && input.files.length >= 0) {
+                            for (var i = 0; i < input.files.length; i++) {
+                                var reader = new FileReader();
+                                var theFileName = input.files[i].name
+            
+                                if (theFileName.includes("_")) {
+                                    if (!theFileName.includes(":")) {
+                                        let t = theFileName.split("_")
+                                        //2023-03-11_02_00_北極.png -> the old file name
+                                        //2023-06-10_21":"40_北極.png => new one(NOAA)
+                                        theFileName = t[0] + "_" + t[1] + ":" + t[2] + "_" + t[3]
+                                    }
+                                } else {
+                                    PopupAlert({ 'title': '檔案名稱無效', 'body': '無法辨識檔案名稱:' + theFileName + '<br>這將導致系統無法處理你的資料<br>已略過此檔案', 'escCallBack': 'x', 'enterCallBack': 'dismiss' })
+                                    continue;
+                                }
+            
+                                reader.onload = function (e) {
+                                    console.log(e)
+            
+                                    // $("#upload-file-preview").html(`<img src="${e.target.result}" width=200 />`)
+                                    imgCount++; activeImg++;
+                                    //    console.log(img)
+                                    //  $(`#img-${imgCount}`).attr('src',e.target.result)
+                                    //console.log(input.files[i])
+            
+                                    $("#data-display").append(`
+            <div class="data-item" id="data-${imgCount}">
+            <div class="d-flex">
+                <div class="data-image" id="img-container-${imgCount}">
+                <img alt='無法取得資料' id='img-${imgCount}' src='${e.target.result}' onload="Img('loaded',{'id':'img-${imgCount}','num':${imgCount}})" onerror="Img('error',{'id':'img-${imgCount}','num':${imgCount}})"></div>
+                <div style="padding: 5px;">
+            
+                    <div class="btn-group" role="group" aria-label="toolbar">
+                        <button type="button" class="btn btn-primary" id='download-${imgCount}' onclick="Img('dl',{'id':'img-${imgCount}','num':${imgCount}})">
+                            <i class="bi bi-download"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="Img('del',{'id':'data-${imgCount}','num':${imgCount}})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                    <br>
+                    <span data-from="" id="data-from-${imgCount}">上傳的檔案</span>
+                    <br>
+                    <span id="data-filename-${imgCount}" data-filename="${theFileName}">${theFileName}</span>
+                    <br>
+                    <span class='text-secondary'>圖片 #${imgCount}</span>
+                </div>
+            </div>
+            </div>
+            `)
+                                    $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
+                                    $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
+            
+                                }
+                                reader.readAsDataURL(input.files[i]);
+                            }
+            
+            
+            
+            
+                        } else {
+                            PopupAlert({ 'title': '請選擇圖片', 'body': '你沒有選擇要上傳的圖片檔案!', 'escCallBack': 'x', 'enterCallBack': 'dismiss' })
+                        }*/
         }
 
 
         var imgCount = 0, activeImg = 0, errorImgArr = [], imgNums = [], imgData = [];
-        function Img(type, par) {
+        async function Img(type, par) {
 
             console.log({ "type": type, "par": par })
 
@@ -549,7 +669,7 @@
          </div>`, enterCallBack: "dismiss", escCallBack: "x"
                      })*/
                     errorImgArr.push('data-' + par.num)
-                    $('#' + par.id).remove();
+                    //  $('#' + par.id).remove();
                     //      $('.cvs-select-' + par.num).remove()
                     $("#img-container-" + par.num).html(`<div class='img-err-alt'><i class="bi bi-x-circle text-danger" style='font-size:2.5em'></i><h6 class='text-danger'>資料讀取失敗</h6></div>`)
                     $("#data-loading-" + par.num).remove()
@@ -559,6 +679,68 @@
             }
             else if (type == "loaded") {
                 $("#data-loading-" + par.num).remove()
+                console.log(document.getElementById("img-" + par.num))
+
+                if (document.getElementById("img-setting-switch-1").checked) {
+                    var bs64 = await imageToDataURL($("#img-" + par.num).attr("src")),
+                        theFileName = $("#data-filename-" + par.num).attr("data-filename").split(".")[0] + "--套色",
+                        theColor;
+
+                    switch ($("#img-setting-select-1").val()) {
+                        case "red":
+                            theColor = [255, 0, 0]
+                            break;
+
+                        case "blue":
+                            theColor = [0, 0, 255]
+                            break;
+
+                        case "yellow":
+                            theColor = [255, 255, 0]
+                            break;
+                        case "green":
+                            theColor = [0, 128, 0]
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    bs64 = await recolorImage(bs64, theColor, function (img) {
+                        imgCount++
+
+                        //console.log("BS64:", bs64)
+                        $("#data-display").append(`
+<div class="data-item" id="data-${imgCount}">
+<div class="d-flex">
+    <div class="data-image" id="img-container-${imgCount}">
+    <img alt='無法取得資料' id='img-${imgCount}' src='${img}' onerror="Img('error',{'id':'img-${imgCount}','num':${imgCount}})"></div>
+    <div style="padding: 5px;">
+
+        <div class="btn-group" role="group" aria-label="toolbar">
+            <button type="button" class="btn btn-primary" id='download-${imgCount}' onclick="Img('dl',{'id':'img-${imgCount}','num':${imgCount}})">
+                <i class="bi bi-download"></i>
+            </button>
+            <button type="button" class="btn btn-danger" onclick="Img('del',{'id':'data-${imgCount}','num':${imgCount}})">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+        <br>
+        <span data-from="" id="data-from-${imgCount}">套色後的檔案</span>
+        <br>
+        <span id="data-filename-${imgCount}" data-filename="${theFileName}">${theFileName}</span>
+        <br>
+        <span class='text-secondary'>圖片 #${imgCount}</span>
+    </div>
+</div>
+</div>
+`)
+                        $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
+                        $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
+                    })
+
+
+                }
             }
             else if (type == 'help') {
 
@@ -602,7 +784,8 @@
                         <option value="0" class="cvs-select-0">請選擇圖片</option>
                     </select>
                     <span>&nbsp; 透明度:</span>
-                    <input type="number" placeholder="透明" value="50" min="0" max="100" id="img-data-input-${layerCount}" class="form-control"><span>%</span>
+                    <input type="number" value="50" min="0" max="100" id="img-data-input-${layerCount}" class="form-control"><span>%</span>
+
                 </div>
         
 
@@ -644,9 +827,9 @@
             else if (type == "flip") {
                 console.log()
                 if (!_Canvas.getActiveObject().flipY) {
-                    _Canvas.getActiveObject().set("angle", "-180").set("flipY", true).set("top", 850).set("left", 850)//set("angle", "-180").set('flipY', true);
+                    _Canvas.getActiveObject().set("angle", -180).set("flipY", true).set("top", 850).set("left", 850)//set("angle", "-180").set('flipY', true);
                 } else {
-                    _Canvas.getActiveObject().set("angle", "0").set("flipY", false).set("top", 50).set("left", 50)//set("angle", "-180").set('flipY', true);
+                    _Canvas.getActiveObject().set("angle", 0).set("flipY", false).set("top", 50).set("left", 50)//set("angle", "-180").set('flipY', true);
                 }
 
                 _Canvas.renderAll()
@@ -804,6 +987,7 @@
                     #${dataCount}</span><br><span class='text-secondary'>DOCX檔案 - 表格整理
                         <br>模板:<select id="template-${dataCount}"><option value="A">同時不同地</option><option value="B">同地不同時</option></select>
                         <br><textarea id="summery-${dataCount}" placeholder="新增說明..." style="height: 38px;"></textarea></span>
+                        
             </div>
         </div>
     </div>
@@ -1022,18 +1206,20 @@
 
                 var img_element = await imageToDataURL($("#img-" + data[i]).attr("src"));
 
-                  //  img_draw = new fabric.Image(img_element, {
-                   //     name: `第 ${i} 層`,
-                  //      top: 50,
-                   //     left: 50,
-                   //     inverted: true,
-                     //   opacity: (Math.abs(1 - alpha[i] / 100))
-                  //  });
+                // img_draw = new fabric.Image(img_element, {
+                //     name: `第 ${i} 層`,
+                //    top: 50,
+                //    left: 50,
+                //     inverted: true,
+                //     opacity: (Math.abs(1 - alpha[i] / 100))
+                // });
 
+                console.log(`[IMG-${i}]`, img_element)
                 fabric.Image.fromURL(img_element, function (img) {
-                    img.name= `第 ${i} 層`
-                    img.top= 50;
-                    img.left= 50;
+                    img.name = `第 ${i} 層`
+                    img.top = 50;
+                    img.left = 50;
+                    img.opacity = (Math.abs(1 - alpha[i] / 100));
                     _Canvas.add(img);
                     img.bringToFront();
                     c = null;
@@ -1041,9 +1227,13 @@
                     _Canvas.renderAll();
                 });
 
-                console.log(img_element)
-               // _Canvas.add(img_draw)
+                // console.log(img_element)
+
+                //  _Canvas.add(img_draw)
+                _Canvas.renderAll()
                 Canvas("update_data")
+
+
             }
         }
 
@@ -1131,7 +1321,7 @@
     mso-paper-source: 0;layout-grid: 18.0pt;}img,img.img{width:5em !important;height:5em !important;}
     </style>
         <div class=WordSection1>
-            <p><h3>啟用編輯以查看完整圖片<br>此處資料經四捨五入，詳細資料數值請參考XLSX檔案</h3></p>
+            <p><h3>啟用編輯以查看完整圖片<br>此處資料經四捨五入，詳細資料數值請參考XLSX檔案<br>如有出現內容誤植等錯誤，請自行修正補充</h3></p>
             <table style='margin-left:13.95pt;border-collapse:collapse;border:none;'>
                 <tr>
                     <td width=113 valign=top style='width:3.0cm;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
@@ -1299,40 +1489,94 @@
 
 
 
-        function recolorImage(img, oldRed, oldGreen, oldBlue, newRed, newGreen, newBlue) {
+        async function recolorImage(imgSrc, newcolor, nextFunc) {
 
-            var c = document.createElement('canvas');
-            var ctx = c.getContext("2d");
-            var w = img.width;
-            var h = img.height;
+            //imgSrc is data url
+            const image = new Image();
+            image.src = (imgSrc)
+            image.onload = function () {
+                const canvas = document.createElement('canvas');
+                canvas.width = image.width;
+                canvas.height = image.height;
 
-            c.width = w;
-            c.height = h;
+                const context = canvas.getContext('2d');
+                context.drawImage(image, 0, 0);
 
-            // draw the image on the temporary canvas
-            ctx.drawImage(img, 0, 0, w, h);
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                const pixels = imageData.data;
 
-            // pull the entire image into an array of pixel data
-            var imageData = ctx.getImageData(0, 0, w, h);
+                // 处理每个像素
+                for (let i = 0; i < pixels.length; i += 4) {
 
-            // examine every pixel, 
-            // change any old rgb to the new-rgb
-            for (var i = 0; i < imageData.data.length; i += 4) {
-                // is this pixel the old rgb?
-                if (imageData.data[i] == oldRed && imageData.data[i + 1] == oldGreen && imageData.data[i + 2] == oldBlue) {
-                    // change to your new rgb
-                    imageData.data[i] = newRed;
-                    imageData.data[i + 1] = newGreen;
-                    imageData.data[i + 2] = newBlue;
+                    const red = pixels[i];
+                    const green = pixels[i + 1];
+                    const blue = pixels[i + 2];
+                    const alpha = pixels[i + 3];
+
+                    // 判断是否为绿色像素
+                    if (green - 25 > red && green - 5 > blue) {
+                        // 替换为红色
+                        pixels[i] = newcolor[0];  // 红色通道
+                        pixels[i + 1] = newcolor[1];  // 绿色通道
+                        pixels[i + 2] = newcolor[2];  // 蓝色通道
+                        // 不改变透明度
+
+                    }
+                    // 判断是否为紅色像素
+                    if ((red - 10 > green && red - 10 > blue) || (Math.abs(red - green) - 200 > blue)) {
+                        // 替换为红色
+                        pixels[i] = newcolor[0];  // 红色通道
+                        pixels[i + 1] = newcolor[1];  // 绿色通道
+                        pixels[i + 2] = newcolor[2];  // 蓝色通道
+                        // 不改变透明度
+
+                    }
+
+                    if ((red > 230 && green > 230) && blue < 70) {
+                        // 替换为红色
+                        pixels[i] = newcolor[0];  // 红色通道
+                        pixels[i + 1] = newcolor[1];  // 绿色通道
+                        pixels[i + 2] = newcolor[2];  // 蓝色通道
+                        // 不改变透明度
+
+                    }
+                    if ((red > 170 && green > 170) && blue < 155) {
+                        // 替换为红色
+                        pixels[i] = newcolor[0];  // 红色通道
+                        pixels[i + 1] = newcolor[1];  // 绿色通道
+                        pixels[i + 2] = newcolor[2];  // 蓝色通道
+                        // 不改变透明度
+
+                    }
+
+
                 }
+
+                // 将修改后的像素数据放回canvas中
+                context.putImageData(imageData, 0, 0);
+                /*console.log("data---", canvas.toDataURL())
+
+                const imgEl = document.createElement('img')
+                imgEl.src = canvas.toDataURL()
+                imgEl.onload = () => {
+                    const image = new fabric.Image(imgEl, {
+                        name: `第 ${index} 層`,
+                        top: 50,
+                        left: 50,
+                        inverted: true,
+                        opacity: (Math.abs(1 - alpha / 100))
+                    })
+                    _Canvas.add(image)
+                }*/
+
+                console.log("DUL", canvas.toDataURL())
+                nextFunc(canvas.toDataURL())
+                return canvas.toDataURL()
             }
-            // put the altered data back on the canvas  
-            ctx.putImageData(imageData, 0, 0);
-            // put the re-colored image back on the image
-            // var img1 = document.getElementById("image1");
-            return c.toDataURL('image/png');
 
         }
+
+
     </script>
 </body>
 
