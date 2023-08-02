@@ -989,22 +989,6 @@
                 //$("#upload-file-name").text("請選擇檔案")
             }
         }
-fabric.Image.fromUrl(imageUrl, (myImg) => {
-    myImg.filters.push(new fabric.Image.filters.BlendColor({
-        color: '#FF0000', // make it red!
-        mode: 'tint',
-        opacity: 0
-    }))
-
-    // Set some data
-    myImg.set({left: 0, top: 0, scaleX: 1, scaleY: 1})
-
-    // Add image to canvas
-    canvas.add(myImg)
-
-    // Render!
-    canvas.renderAll()
-})
 
     </script>
 </body>

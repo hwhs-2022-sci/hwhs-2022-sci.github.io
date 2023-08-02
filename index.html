@@ -96,8 +96,8 @@
 
 <body>
     <div class="alert alert-info sticky-top alert-dismissible fade show" role="alert">
-       使用說明<a target="_blank" href="/help/使用說明v2.docx" class="alert-link">請按我</a>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>  
+        使用說明<a target="_blank" href="/help/使用說明v2.docx" class="alert-link">請按我</a>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
     <div id="app" style="padding: 20px;" class="d-flex">
@@ -110,8 +110,9 @@
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked
                         onclick="$('#img-setting-alert-1').hide();$('#img-setting-switch-1').removeAttr('disabled')">
-                        
-                        <label onclick="$('#img-setting-alert-1').hide();$('#img-setting-switch-1').removeAttr('disabled')" class="form-check-label"  for="flexRadioDefault1">
+
+                    <label onclick="$('#img-setting-alert-1').hide();$('#img-setting-switch-1').removeAttr('disabled')"
+                        class="form-check-label" for="flexRadioDefault1">
                         <div class="d-flex me-1">
                             <input type="date" name="" id="date-input"
                                 onchange="date = this.value;$('#flexRadioDefault1').attr('checked','checked')"
@@ -150,23 +151,14 @@
                         $('#img-setting-switch-1').removeAttr('disabled')
                     }">
                         <div class="d-flex mt-1">
-                            <input type="file" id="input-file" accept="image/*" multiple onchange="$('#flexRadioDefault2').attr('checked','checked')
-                                if(this.files.length>1){
-                                    $('#img-setting-alert-1').show()
-                                    $('#img-setting-switch-1').attr('disabled','disabled')
-                                    document.getElementById('img-setting-switch-1').checked = false
-                                }else{
-                                    $('#img-setting-alert-1').hide()
-                                    $('#img-setting-switch-1').removeAttr('disabled')
-                                }
-                                " onfocus="$('#flexRadioDefault2').attr('checked','checked')">
+                            <input type="file" id="input-file" accept="image/*" multiple
+                                onchange="$('#flexRadioDefault2').attr('checked','checked')"
+                                onfocus="$('#flexRadioDefault2').attr('checked','checked')">
                         </div>
                     </label>
                 </div>
                 <p></p>
                 <div class="card card-body">
-                    <div style="display: none;" class="alert alert-warning" id="img-setting-alert-1">選取超過1個檔案，無法進行此操作
-                    </div>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="img-setting-switch-1" onchange="
                             if(this.checked){
@@ -183,9 +175,10 @@
                     選擇顏色: <select id="img-setting-select-1" disabled class="form-select form-control">
                         <option value="red">紅</option>
                         <option value="yellow">黃</option>
-                        <option value="green">綠</option>
-                        <option value="blue">藍</option>
+                        <option value="green">綠(不建議)</option>
+                        <option value="blue">藍(不建議)</option>
                     </select>
+
                 </div>
                 <p></p>
                 <button class="btn btn-primary" onclick="Img('get')">確定</button>
@@ -305,7 +298,7 @@
         <span style="user-select: none;">&nbsp;&nbsp;</span>
         <span style="float: right;position: absolute; right: 0;"
             onclick="PopupAlert({title:`關於`,body:`<h5>極光資料分析</h5><h6>v1.0 <br>BY Jerry 2022-03</h6>`})">By
-            Jerry 2023.07 v2</span>
+            Jerry 2023.08 v2</span>
     </div>
 
 
@@ -384,9 +377,10 @@
             return check;
         };
         if (window.mobileAndTabletCheck()) {
-            location.href = "/mobile.html"
+            if (confirm("要前往手機版嗎?\n如果要繼續使用電腦版，建議勾選使用電腦版網站，以免跑版")) {
+                location.href = "/mobile.html"
+            }
         }
-
 
         //date -> formated str (y/m/d)
         //time -> formated str (h:m:s)
@@ -467,14 +461,15 @@
 </div>
 `)
                     $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
-                    $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
+                    $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 500);
 
                     const img = document.getElementById(`img-${imgCount}`);
                     img.src = URL.createObjectURL(input.files[i]);
                     //img.height = 60;
                     img.onload = async function () {
+                        console.log("[IMG LOADED]", img)
                         //  URL.revokeObjectURL(img.src);
-                        await Img('loaded', { 'id': `img-${imgCount}`, 'num': imgCount })
+                        await Img('loaded', { 'id': img.id, 'num': img.id.split("-")[1] })
                     };
                     //li.appendChild(img);
 
@@ -624,7 +619,7 @@
                 </div>
 
                 `)
-                            $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
+                            $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 500);
                             //    imgData.push([])
                             $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
 
@@ -694,23 +689,20 @@
                         case "red":
                             theColor = [255, 0, 0]
                             break;
-
                         case "blue":
                             theColor = [0, 0, 255]
                             break;
-
                         case "yellow":
                             theColor = [255, 255, 0]
                             break;
                         case "green":
                             theColor = [0, 128, 0]
                             break;
-
                         default:
                             break;
                     }
-
-                    bs64 = await recolorImage(bs64, theColor, function (img) {
+                    var bs64;
+                    bs64 = /*await*/ recolorImage(bs64, theColor, function (img) {
                         imgCount++
 
                         //console.log("BS64:", bs64)
@@ -735,12 +727,14 @@
         <span id="data-filename-${imgCount}" data-filename="${theFileName}">${theFileName}</span>
         <br>
         <span class='text-secondary'>圖片 #${imgCount}</span>
+        <br>
+        <span>原始圖片:<a href="#img-${par.num}">圖片 #${par.num}</a></span>
     </div>
 </div>
 </div>
 `)
                         $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
-                        $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 1000);
+                        $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 500);
                     })
 
 
@@ -1495,19 +1489,20 @@
 
         async function recolorImage(imgSrc, newcolor, nextFunc) {
 
+            console.log(imgSrc, newcolor, "\n [RECOLOR]")
             //imgSrc is data url
             const image = new Image();
             image.src = (imgSrc)
             image.onload = function () {
-                const canvas = document.createElement('canvas');
+                var canvas = document.createElement('canvas');
                 canvas.width = image.width;
                 canvas.height = image.height;
 
-                const context = canvas.getContext('2d');
+                var context = canvas.getContext('2d');
                 context.drawImage(image, 0, 0);
 
-                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                const pixels = imageData.data;
+                var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                var pixels = imageData.data;
 
                 // 处理每个像素
                 for (let i = 0; i < pixels.length; i += 4) {
@@ -1552,7 +1547,12 @@
                         // 不改变透明度
 
                     }
-
+                    if (red < 25 && Math.abs(green - blue) < 30 && red - green < -20) {
+                        pixels[i] = newcolor[0];  // 红色通道
+                        pixels[i + 1] = newcolor[1];  // 绿色通道
+                        pixels[i + 2] = newcolor[2];  // 蓝色通道
+                        // 不改变透明度
+                    }
 
                 }
 
@@ -1573,7 +1573,7 @@
                     _Canvas.add(image)
                 }*/
 
-                console.log("DUL", canvas.toDataURL())
+                //  console.log("DUL", canvas.toDataURL())
                 nextFunc(canvas.toDataURL())
                 return canvas.toDataURL()
             }
