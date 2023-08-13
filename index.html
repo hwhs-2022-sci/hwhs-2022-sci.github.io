@@ -142,7 +142,8 @@
                 <div class="card card-body">
                     <h4>進階設定</h4>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="img-setting-switch-1" onchange="
+                        <input class="form-check-input" type="radio" name="img-setting-radio" id="img-setting-switch-1"
+                            onchange="
                             if(this.checked){
                                 $('#img-setting-checkbox-1').removeAttr('disabled')
                                 $('#img-setting-select-1').removeAttr('disabled')
@@ -162,8 +163,8 @@
                     </select>
                     <p></p>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="img-setting-switch-2">
-                        <label class="form-check-label" for="img-setting-switch-2">標記地軸與磁軸</label>
+                        <input class="form-check-input" type="radio" name="img-setting-radio" id="img-setting-switch-2">
+                        <label class="form-check-label" for="img-setting-switch-2">標記磁軸</label>
                     </div>
                 </div>
                 <p></p>
@@ -421,7 +422,7 @@
                     //console.log(input.files[i])
                     imgCount++; activeImg++;
                     var theFileName = input.files[i].name
-                    if (!theFileName.includes("北極") && !theFileName.includes("南極")) {
+                    if (!theFileName.includes("北極") && !theFileName.includes("南極")) {//沒法判斷是否為科展圖片
                         $("#data-display").append(`
 <div class="data-item" id="data-${imgCount}">
 <div class="d-flex">
@@ -438,7 +439,7 @@
         <br>
         <span data-from="" id="data-from-${imgCount}">上傳的檔案</span>
         <br>
-        <span id="data-filename-${imgCount}" data-filename="${theFileName}">${theFileName}</span>
+        <span id="data-filename-${imgCount}" data-filename="${theFileName}"><s class="text-danger">${theFileName}</s><br/><span class="text-danger">檔案名稱無效</span></span>
         <br>
         <span class='text-secondary'>圖片 #${imgCount}</span></div></div></div>`)
                     } else {
@@ -679,7 +680,8 @@
                 $("#data-loading-" + par.num).remove()
                 console.log(document.getElementById("img-" + par.num))
 
-                if (document.getElementById("img-setting-switch-1").checked && document.getElementById("img-setting-switch-2").checked) {
+
+                if (document.getElementById("img-setting-switch-1").checked && !$("#data-filename-" + par.num).attr("data-filename").split(".")[0].includes("--")) {
                     var bs64 = await imageToDataURL($("#img-" + par.num).attr("src")),
                         theFileName = $("#data-filename-" + par.num).attr("data-filename").split(".")[0] + "--套色",
                         theColor;
@@ -732,101 +734,15 @@
 </div>
 </div>
 `)
-                        var theFileName = $("#data-filename-" + par.num).attr("data-filename").split(".")[0] + "--標記"
-
-                        var theCanvas = document.createElement("canvas"),
-                            theCtx = theCanvas.getContext("2d")
-                        theCanvas.width = 800
-                        theCanvas.height = 800
-
-                        theCtx.drawImage(document.getElementById("img-" + par.num), 0, 0)
-                        theCtx.arc(380, 330, 5, 0, Math.PI * 2)
-                        theCtx.fillStyle = 'yellow' //設定填充顏色為藍色
-                        theCtx.fill() //最後填滿路徑，形成藍色圓形
-
-                        var img = theCanvas.toDataURL()
-
-                        imgCount++
-
-                        $("#data-display").append(`
-<div class="data-item" id="data-${imgCount}">
-<div class="d-flex">
-<div class="data-image" id="img-container-${imgCount}">
-<img alt='無法取得資料' id='img-${imgCount}' src='${img}' onerror="Img('error',{'id':'img-${imgCount}','num':${imgCount}})"></div>
-<div style="padding: 5px;">
-
-<div class="btn-group" role="group" aria-label="toolbar">
-<button type="button" class="btn btn-primary" id='download-${imgCount}' onclick="Img('dl',{'id':'img-${imgCount}','num':${imgCount}})">
-<i class="bi bi-download"></i>
-</button>
-<button type="button" class="btn btn-danger" onclick="Img('del',{'id':'data-${imgCount}','num':${imgCount}})"><i class="bi bi-trash"></i></button></div><br>
-<span data-from="" id="data-from-${imgCount}">標記後的檔案</span><br>
-<span id="data-filename-${imgCount}" data-filename="${theFileName}">${theFileName}</span><br>
-<span class='text-secondary'>圖片 #${imgCount}</span><br>
-<span>原始圖片:<a href="#img-${par.num}">圖片 #${par.num}</a></span></div></div></div>`)
-
-                    })
-                }
-                else if (document.getElementById("img-setting-switch-1").checked && !$("#data-filename-" + par.num).attr("data-filename").split(".")[0].includes("--")) {
-                    var bs64 = await imageToDataURL($("#img-" + par.num).attr("src")),
-                        theFileName = $("#data-filename-" + par.num).attr("data-filename").split(".")[0] + "--套色",
-                        theColor;
-                    console.log("----")
-                    switch ($("#img-setting-select-1").val()) {
-                        case "red":
-                            theColor = [255, 0, 0]
-                            break;
-                        case "blue":
-                            theColor = [0, 0, 255]
-                            break;
-                        case "yellow":
-                            theColor = [255, 255, 0]
-                            break;
-                        case "green":
-                            theColor = [0, 128, 0]
-                            break;
-                        default:
-                            break;
-                    }
-                    var bs64;
-                    bs64 = /*await*/ recolorImage(bs64, theColor, function (img) {
-                        imgCount++
-
-                        //console.log("BS64:", bs64)
-                        $("#data-display").append(`
-<div class="data-item" id="data-${imgCount}">
-<div class="d-flex">
-    <div class="data-image" id="img-container-${imgCount}">
-    <img alt='無法取得資料' id='img-${imgCount}' src='${img}' onerror="Img('error',{'id':'img-${imgCount}','num':${imgCount}})"></div>
-    <div style="padding: 5px;">
-
-        <div class="btn-group" role="group" aria-label="toolbar">
-            <button type="button" class="btn btn-primary" id='download-${imgCount}' onclick="Img('dl',{'id':'img-${imgCount}','num':${imgCount}})">
-                <i class="bi bi-download"></i>
-            </button>
-            <button type="button" class="btn btn-danger" onclick="Img('del',{'id':'data-${imgCount}','num':${imgCount}})">
-                <i class="bi bi-trash"></i>
-            </button>
-        </div>
-        <br>
-        <span data-from="" id="data-from-${imgCount}">套色後的檔案</span>
-        <br>
-        <span id="data-filename-${imgCount}" data-filename="${theFileName}">${theFileName}</span>
-        <br>
-        <span class='text-secondary'>圖片 #${imgCount}</span>
-        <br>
-        <span>原始圖片:<a href="#img-${par.num}">圖片 #${par.num}</a></span>
-    </div>
-</div>
-</div>
-`)
+                        $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
+                        $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 500);
 
                     })
 
 
                 }
 
-                else if (document.getElementById("img-setting-switch-2").checked && !$("#data-filename-" + par.num).attr("data-filename").split(".")[0].includes("--")) {
+                if (document.getElementById("img-setting-switch-2").checked && !$("#data-filename-" + par.num).attr("data-filename").split(".")[0].includes("--")) {
                     var theFileName = $("#data-filename-" + par.num).attr("data-filename").split(".")[0] + "--標記"
 
                     var theCanvas = document.createElement("canvas"),
@@ -835,7 +751,11 @@
                     theCanvas.height = 800
 
                     theCtx.drawImage(document.getElementById("img-" + par.num), 0, 0)
-                    theCtx.arc(380, 330, 5, 0, Math.PI * 2)
+                    if (theFileName.includes("南極")) {
+                        theCtx.arc(230, 440, 5, 0, Math.PI * 2)
+                    } else if (theFileName.includes("北極")) {
+                        theCtx.arc(380, 330, 5, 0, Math.PI * 2)
+                    }
                     theCtx.fillStyle = 'yellow' //設定填充顏色為藍色
                     theCtx.fill() //最後填滿路徑，形成藍色圓形
 
@@ -859,12 +779,13 @@
 <span id="data-filename-${imgCount}" data-filename="${theFileName}">${theFileName}</span><br>
 <span class='text-secondary'>圖片 #${imgCount}</span><br>
 <span>原始圖片:<a href="#img-${par.num}">圖片 #${par.num}</a></span></div></div></div>`)
+                    $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
+                    $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 500);
 
                 }
 
 
-                $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
-                $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 500);
+
             }
             else if (type == 'help') {
 
