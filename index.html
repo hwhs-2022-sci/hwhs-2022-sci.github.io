@@ -6,8 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>極光資料分析</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel='stylesheet'
         href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css'
         integrity='sha512-5PV92qsds/16vyYIJo3T/As4m2d8b6oWYfoqV+vtizRB6KhF1F9kYzWzQmsO6T3z3QG2Xdhrx7FQ+5R1LiQdUA=='
@@ -91,10 +90,78 @@
         .form-select {
             width: fit-content;
         }
+
+
+        .mxw-50 {
+            max-width: 50%;
+
+        }
+
+        .mxh-50 {
+            max-height: 50%;
+        }
     </style>
 </head>
 
-<body>
+<body style="width: 100%; height: 100%;">
+    <center>
+        <div id="fullscreen" class="bg-black rounded p-2"
+            style="overflow:auto;width: 100vw; height: 100vh;  position: fixed; top: 0; text-align: left;display: none;z-index: 999990;">
+
+            <div>
+                <h2 class="text-light">全螢幕檢視
+                    <div data-bs-theme="dark" style="float: right;">
+                        <button type="button" class="btn-close btn-sm" aria-label="Close"
+                            onclick="$('#fullscreen').hide();$('body').css('overflow-y','scroll')"></button>
+                    </div>
+                </h2>
+
+                <div class="container text-light" style="height: fit-content;">
+                    <div class="row row-cols-2 h-100">
+                        <div class="col h-100 p-3">
+                            <div>
+                                <div id="fsc-img-1"></div>
+                                <span id="fsc-filename-1"></span>
+                            </div>
+                            <input class="form-control" type="text" list="file-name-datalist" onblur="
+                            $('#fsc-img-1').html(`<img style='max-height:20rem' src='${$(`#img-${this.value}`).attr('src')}'>`);
+                                $('#fsc-filename-1').text($('#data-filename-' + this.value).attr('data-filename'))">
+                        </div>
+                        <div class="col h-100 p-3 mxw-50 mxh-50">
+                            <div>
+                                <div id="fsc-img-2"></div>
+                                <span id="fsc-filename-2"></span>
+                            </div>
+                            <input class="form-control" type="text" list="file-name-datalist" onblur="
+                            $('#fsc-img-2').html(`<img style='max-height:20rem' src='${$(`#img-${this.value}`).attr('src')}'>`);
+                                $('#fsc-filename-2').text($('#data-filename-' + this.value).attr('data-filename'))">
+                        </div>
+                        <div class="col h-100 p-3">
+                            <div>
+                                <div id="fsc-img-3"></div>
+                                <span id="fsc-filename-3"></span>
+                            </div>
+                            <input class="form-control" type="text" list="file-name-datalist" onblur="
+                            $('#fsc-img-3').html(`<img style='max-height:20rem' src='${$(`#img-${this.value}`).attr('src')}'>`);
+                                $('#fsc-filename-3').text($('#data-filename-' + this.value).attr('data-filename'))">
+                        </div>
+                        <div class="col h-100 p-3">
+                            <div>
+                                <div id="fsc-img-4"></div>
+                                <span id="fsc-filename-4"></span>
+                            </div>
+                            <input class="form-control" type="text" list="file-name-datalist" onblur="
+                            $('#fsc-img-4').html(`<img style='max-height:20rem' src='${$(`#img-${this.value}`).attr('src')}'>`);
+                                $('#fsc-filename-4').text($('#data-filename-' + this.value).attr('data-filename'))">
+                        </div>
+                    </div>
+                </div>
+                <datalist id="file-name-datalist">
+
+                </datalist>
+            </div>
+        </div>
+    </center>
     <div class="alert alert-info sticky-top alert-dismissible fade show" role="alert">
         使用說明<a target="_blank" href="/help/使用說明v2.docx" class="alert-link">請按我</a>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -173,12 +240,16 @@
             </div>
 
             <hr>
-            <h2>2. 圖片顯示</h2>
+            <h2>2. 圖片顯示
+                <button class="btn btn-primary" style="float: right;"
+                    onclick="$('#fullscreen').show();$('body').css('overflow-y','hidden')"><i
+                        class="bi bi-box-arrow-up-right"></i>全螢幕檢視</button>
+            </h2>
+
             <p>圖片出現在這裡之後，就可以做圖片分析</p>
+
             <div id="data-display">
-
                 <span id="img-placeholder">已經取得的圖片<wbr>會顯示在這裡</span>
-
             </div>
 
             <hr>
@@ -284,9 +355,10 @@
 
         <span style="user-select: none;">&nbsp;&nbsp;</span>
         <span style="float: right;position: absolute; right: 0;"
-            onclick="PopupAlert({title:`關於`,body:`<h5>極光資料分析</h5><h6>v1.0 <br>BY Jerry 2022-03</h6>`})">By
+            onclick="PopupAlert({title:`關於`,body:`<h5>極光資料分析</h5><h6>v2.0 <br>BY Jerry 2022-08</h6>`})">By
             Jerry 2023.08 v2</span>
     </div>
+
 
 
     <!--------------------------BS.Modal----------------------------->
@@ -325,9 +397,7 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.js'
         integrity='sha512-CX7sDOp7UTAq+i1FYIlf9Uo27x4os+kGeoT7rgwvY+4dmjqV0IuE/Bl5hVsjnQPQiTOhAX1O2r2j5bjsFBvv/A=='
         crossorigin='anonymous'></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!--fabric.js-->
     <script src='https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.js'
@@ -467,7 +537,7 @@
         <span class='text-secondary'>圖片 #${imgCount}</span></div></div></div>`)
                         $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
                         $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 500);
-
+                        $("#file-name-datalist").append(`<option value="${imgCount}" class="cvs-select-${imgCount}">${$("#data-filename-" + imgCount).attr("data-filename")}</option>`)
                         const img = document.getElementById(`img-${imgCount}`);
                         img.src = URL.createObjectURL(input.files[i]);
                         //img.height = 60;
@@ -622,7 +692,7 @@
                             $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 500);
                             //    imgData.push([])
                             $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
-
+                            $("#file-name-datalist").append(`<option value="${imgCount}" class="cvs-select-${imgCount}">${$("#data-filename-" + imgCount).attr("data-filename")}</option>`)
                         }
                     } else {
                         let html = ''
@@ -734,6 +804,7 @@
 </div>
 </div>
 `)
+                        $("#file-name-datalist").append(`<option value="${imgCount}" class="cvs-select-${imgCount}">${$("#data-filename-" + imgCount).attr("data-filename")}</option>`)
                         $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
                         $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 500);
 
@@ -781,7 +852,7 @@
 <span>原始圖片:<a href="#img-${par.num}">圖片 #${par.num}</a></span></div></div></div>`)
                     $(".img-data-list").append(`<option value=${imgCount} class='cvs-select-${imgCount}'>#${imgCount}</option>`)
                     $("#data-display").animate({ scrollTop: $('#data-display').prop("scrollHeight") }, 500);
-
+                    $("#file-name-datalist").append(`<option value="${imgCount}" class="cvs-select-${imgCount}">${$("#data-filename-" + imgCount).attr("data-filename")}</option>`)
                 }
 
 
