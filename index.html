@@ -105,7 +105,7 @@
 
 <body style="width: 100%; height: 100%;">
     <center>
-        <div id="fullscreen" class="bg-black rounded p-2"
+        <div id="fullscreen" class="bg-black p-2"
             style="overflow:auto;width: 100%; height: 100%;  position: fixed; top: 0; text-align: left;display: none;z-index: 999990;">
 
             <div>
@@ -118,45 +118,70 @@
 
                 <div class="container text-light" style="height: fit-content;">
                     <div class="row row-cols-2 h-100">
-                        <div class="col h-100 p-3">
+                        <div class="col h-100 mb-3 p-3">
                             <div>
                                 <div id="fsc-img-1"></div>
                                 <span id="fsc-filename-1"></span>
                             </div>
-                            <input placeholder="輸入檔案名稱..." class="form-control" type="text" list="file-name-datalist"
+                            <input placeholder="選擇檔案..." class="form-control" type="text" list="file-name-datalist"
                                 onblur="
-                            $('#fsc-img-1').html(`<img style='max-height:20rem' src='${$(`#img-${this.value}`).attr('src')}'>`);
+                            $('#fsc-img-1').html(`<img style='max-height:35rem' src='${$(`#img-${this.value}`).attr('src')}'>`);
                                 $('#fsc-filename-1').text($('#data-filename-' + this.value).attr('data-filename'))">
                         </div>
-                        <div class="col h-100 p-3 mxw-50 mxh-50">
+                        <div class="col h-100 mb-3 p-3 mxw-50 mxh-50">
                             <div>
                                 <div id="fsc-img-2"></div>
                                 <span id="fsc-filename-2"></span>
                             </div>
-                            <input placeholder="輸入檔案名稱..." class="form-control" type="text" list="file-name-datalist"
+                            <input placeholder="選擇檔案..." class="form-control" type="text" list="file-name-datalist"
                                 onblur="
-                            $('#fsc-img-2').html(`<img style='max-height:20rem' src='${$(`#img-${this.value}`).attr('src')}'>`);
+                            $('#fsc-img-2').html(`<img style='max-height:35rem' src='${$(`#img-${this.value}`).attr('src')}'>`);
                                 $('#fsc-filename-2').text($('#data-filename-' + this.value).attr('data-filename'))">
                         </div>
-                        <div class="col h-100 p-3">
+
+                        <div class="col h-100 mt-3  mb-3 p-3">
                             <div>
                                 <div id="fsc-img-3"></div>
                                 <span id="fsc-filename-3"></span>
                             </div>
-                            <input placeholder="輸入檔案名稱..." class="form-control" type="text" list="file-name-datalist"
+                            <input placeholder="選擇檔案..." class="form-control" type="text" list="file-name-datalist"
                                 onblur="
-                            $('#fsc-img-3').html(`<img style='max-height:20rem' src='${$(`#img-${this.value}`).attr('src')}'>`);
+                            $('#fsc-img-3').html(`<img style='max-height:35rem' src='${$(`#img-${this.value}`).attr('src')}'>`);
                                 $('#fsc-filename-3').text($('#data-filename-' + this.value).attr('data-filename'))">
                         </div>
-                        <div class="col h-100 p-3">
+
+                        <div class="col h-100 mt-3 mb-3 p-3">
                             <div>
                                 <div id="fsc-img-4"></div>
                                 <span id="fsc-filename-4"></span>
                             </div>
-                            <input placeholder="輸入檔案名稱..." class="form-control" type="text" list="file-name-datalist"
+                            <input placeholder="選擇檔案..." class="form-control" type="text" list="file-name-datalist"
                                 onblur="
-                            $('#fsc-img-4').html(`<img style='max-height:20rem' src='${$(`#img-${this.value}`).attr('src')}'>`);
+                            $('#fsc-img-4').html(`<img style='max-height:35rem' src='${$(`#img-${this.value}`).attr('src')}'>`);
                                 $('#fsc-filename-4').text($('#data-filename-' + this.value).attr('data-filename'))">
+                        </div>
+
+
+                        <div class="col h-100 mt-3 mb-3 p-3">
+                            <div>
+                                <div id="fsc-img-5"></div>
+                                <span id="fsc-filename-5"></span>
+                            </div>
+                            <input placeholder="選擇檔案..." class="form-control" type="text" list="file-name-datalist"
+                                onblur="
+                            $('#fsc-img-5').html(`<img style='max-height:35rem' src='${$(`#img-${this.value}`).attr('src')}'>`);
+                                $('#fsc-filename-5').text($('#data-filename-' + this.value).attr('data-filename'))">
+                        </div>
+
+                        <div class="col h-100 mt-3 mb-3 p-3">
+                            <div>
+                                <div id="fsc-img-6"></div>
+                                <span id="fsc-filename-6"></span>
+                            </div>
+                            <input placeholder="選擇檔案..." class="form-control" type="text" list="file-name-datalist"
+                                onblur="
+                            $('#fsc-img-6').html(`<img style='max-height:35rem' src='${$(`#img-${this.value}`).attr('src')}'>`);
+                                $('#fsc-filename-6').text($('#data-filename-' + this.value).attr('data-filename'))">
                         </div>
                     </div>
                 </div>
@@ -235,7 +260,7 @@
                     <p></p>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="img-setting-radio" id="img-setting-switch-2">
-                        <label class="form-check-label" for="img-setting-switch-2">標記磁軸</label>
+                        <label class="form-check-label" for="img-setting-switch-2">標記地軸與磁軸</label>
                     </div>
                 </div>
                 <p></p>
@@ -826,13 +851,26 @@
                     theCanvas.height = 800
 
                     theCtx.drawImage(document.getElementById("img-" + par.num), 0, 0)
+
+                    theCtx.beginPath()
                     if (theFileName.includes("南極")) {
                         theCtx.arc(230, 440, 5, 0, Math.PI * 2)
                     } else if (theFileName.includes("北極")) {
                         theCtx.arc(380, 330, 5, 0, Math.PI * 2)
                     }
-                    theCtx.fillStyle = 'yellow' //設定填充顏色為藍色
-                    theCtx.fill() //最後填滿路徑，形成藍色圓形
+                    theCtx.fillStyle = 'yellow'
+                    theCtx.fill()
+                    theCtx.closePath()
+
+                    theCtx.beginPath()
+                    if (theFileName.includes("南極")) {
+                        theCtx.arc(400, 400, 5, 0, Math.PI * 2)
+                    } else if (theFileName.includes("北極")) {
+                        theCtx.arc(400, 330, 5, 0, Math.PI * 2)
+                    }
+                    theCtx.fillStyle = 'white'
+                    theCtx.fill()
+                    theCtx.closePath()
 
                     var img = theCanvas.toDataURL()
 
@@ -1702,6 +1740,11 @@
 
         }
 
+        window.onkeydown = (e => {
+            if (e.keyCode === 27) {
+                $('#fullscreen').hide(); $('body').css('overflow-y', 'scroll')
+            }
+        })
 
     </script>
 </body>
