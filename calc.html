@@ -11,7 +11,7 @@
     </style>
 </head>
 <body class="m-3">
-    <h1>圖片重疊面積計算</h1>
+    <h2>圖片重疊面積計算</h2>
     <div>
         <input id="file-upload" type="file" accept="image/*">
         <p></p>
@@ -31,6 +31,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.js" integrity="sha512-hOJ0mwaJavqi11j0XoBN1PtOJ3ykPdP6lp9n29WVVVVZxgx9LO7kMwyyhaznGJ+kbZrDN1jFZMt2G9bxkOHWFQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
+        const _Canvas = new fabric.Canvas('canvas');
         function readFile(e){
             console.log(e)
             if(!e.files.length){
@@ -39,7 +40,10 @@
                 for(let i=0;i<e.files.length;i++){
                     const img = document.getElementById("img-1")
                     img.src= URL.createObjectURL(input.files[i]);
-                    
+                    img.onload = function(){
+                        var canvas = document.createElement('canvas')
+                        alert("loaded")
+                    }
                 }
             }
         }
