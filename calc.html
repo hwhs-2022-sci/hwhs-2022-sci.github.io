@@ -28,6 +28,11 @@
             console.log(e)
             if(!e.files.length){
                 alert("請選擇檔案")
+            }else{
+                for(let i=0;i<e.files.length;i++){
+                URL.createObjectURL(input.files[i]);
+
+                }
             }
         }
     </script>
