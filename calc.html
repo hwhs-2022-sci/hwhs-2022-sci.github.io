@@ -13,7 +13,9 @@
 <body>
     <h1></h1>
     <div>
-        <input type="file" accept="image/*" onchange="readFile(this)">
+        <input id="file-upload" type="file" accept="image/*">
+        <button class="btn btn-primary"
+        onclick="readFile(document.getElementById('file-upload'))">確定</button>
         <span id="text1">請輸入圖片</span>
     </div>
 
@@ -24,7 +26,9 @@
     <script>
         function readFile(e){
             console.log(e)
-        
+            if(!e.files.length){
+                alert("請選擇檔案")
+            }
         }
     </script>
 </body>
