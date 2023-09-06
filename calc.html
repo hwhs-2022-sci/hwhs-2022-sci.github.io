@@ -34,14 +34,21 @@
         const _Canvas = new fabric.Canvas('canvas');
         function readFile(e){
             console.log(e)
-            if(!e.files.length){
+            if(!e.files.length){ 
                 alert("請選擇檔案")
             }else{
                 for(let i=0;i<e.files.length;i++){
-                    const img = document.getElementById("img-1")
-                    img.src= URL.createObjectURL(input.files[i]);
+                    const img = new Image()
+                    const displayImg = document.getElementById("img-1")
+                    img.src= URL.createObjectURL(e.files[i]);
+                    displayImg.src = URL.createObjectURL(e.files[i])
                     img.onload = function(){
                         var canvas = document.createElement('canvas')
+                        canvas.width = img.width
+                        canvas.height = img.height
+                        var ctx = canvas.getContext("2d")
+                        ctx.drawImage(img,0,0)
+                    
                         alert("loaded")
                     }
                 }
