@@ -10,14 +10,16 @@
 
     </style>
 </head>
-<body>
-    <h1></h1>
+<body class="m-3">
+    <h1>圖片重疊面積計算</h1>
     <div>
         <input id="file-upload" type="file" accept="image/*">
+        <p></p>
         <button class="btn btn-primary"
         onclick="readFile(document.getElementById('file-upload'))">確定</button>
-        <span id="text1">請選擇圖片</span>
-
+        <p></p>
+        <span id="text1">請選擇已經套色的圖片</span>
+        <p></p>
         <canvas id="canvas">error</canvas>
     </div>
     <div>
