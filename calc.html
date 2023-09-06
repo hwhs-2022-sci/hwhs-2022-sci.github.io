@@ -19,7 +19,7 @@
         onclick="readFile(document.getElementById('file-upload'))">確定</button>
         <p></p>
         <img style="max-width: 200px;max-height: 200px;" id="img-1">
-        <p></p>
+        <hr>
         <span id="text1">請選擇已經套色的圖片</span>
         <p></p>
         <canvas id="canvas">error</canvas>
@@ -49,8 +49,17 @@
                         canvas.height = img.height
                         var ctx = canvas.getContext("2d")
                         ctx.drawImage(img,0,0)
+
+                        
                     
                         alert("loaded")
+                    }
+                    displayImg.onload = function(){
+                        const image = new fabric.Image(displayImg, {
+                            top: 0,left: 0
+                        })
+                        _Canvas.add(image)
+                        
                     }
                 }
             }
