@@ -19,7 +19,7 @@
     <div>
         <input id="file-upload" type="file" accept="image/*" onchange="readFile(this)">
         <p></p>
-        <p id="text-1">請選擇已經套色成紅色的圖片</p>
+        <h4 id="text-1">請選擇已經套色成紅色的圖片</h4>
         <img style="max-width: 200px;max-height: 200px;" id="img-1">
         <img style="max-width: 200px;max-height: 200px;" id="img-2">
         <hr>
@@ -27,7 +27,7 @@
         <canvas id="canvas" width="900" height="900"
             style="width:900px;height:900px;border:solid 1px #000">error</canvas>
 
-        <button class="btn btn-primary">繼續</button>
+        <button class="btn btn-primary" onclick="calc()">繼續</button>
     </div>
 
 
@@ -42,16 +42,19 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
-        const _Canvas = new fabric.Canvas('canvas');
+        const _Canvas = new fabric.Canvas('canvas',{
+            isDrawingMode:true,
+            freeDrawingBrush:{
+                width:10,
+                color:"#000"
+            }
+        });
 
         function calc() {
             const img = new Image()
             img.src = _Canvas.toDataURL()
 
-
             img.onload = function () {
-
-
                 var canvas = document.createElement('canvas')
                 canvas.width = img.width
                 canvas.height = img.height
@@ -84,9 +87,7 @@
                 $("#img-2").attr("src", canvas.toDataURL())
 
             }
-
         }
-
 
         function readFile(e) {
             console.log(e)
