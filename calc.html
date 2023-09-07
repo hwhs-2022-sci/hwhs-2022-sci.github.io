@@ -59,7 +59,7 @@
                             const B = pixels[i+2]
                             const A = pixels[i+3]
 
-                            if(R == 0 && G == 0 && B == 0 && A == 1){
+                            if(R == 255 && G == 0 && B == 0 && A == 1){
                                 area++
                                 $("#text-1").text(`目前重疊面積： ${area}像素 〔計算中〕`)
 
