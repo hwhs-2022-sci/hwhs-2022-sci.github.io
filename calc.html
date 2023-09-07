@@ -23,11 +23,12 @@
         <img style="max-width: 200px;max-height: 200px;" id="img-1">
         <img style="max-width: 200px;max-height: 200px;" id="img-2">
         <hr>
+        <button class="btn btn-primary" onclick="calc()">繼續</button>
+<p></p>
         <p>修正圖片<br>請塗掉多餘的部分</p>
         <canvas id="canvas" width="900" height="900"
             style="width:900px;height:900px;border:solid 1px #000">error</canvas>
 
-        <button class="btn btn-primary" onclick="calc()">繼續</button>
     </div>
 
 
@@ -45,7 +46,7 @@
         const _Canvas = new fabric.Canvas('canvas',{
             isDrawingMode:true,
             freeDrawingBrush:{
-                width:10,
+                width:50,
                 color:"#000"
             }
         });
@@ -71,6 +72,7 @@
                     const G = pixels[i + 1]
                     const B = pixels[i + 2]
                     const A = pixels[i + 3]
+                    allpixels++
 
                     if (R == 255 && G == 0 && B == 0) {
                         area++
