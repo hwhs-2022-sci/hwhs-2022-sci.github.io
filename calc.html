@@ -17,18 +17,19 @@
 <body class="m-3">
     <h2>圖片重疊面積計算</h2>
     <div>
-        <input id="file-upload" type="file" accept="image/*">
+        <input id="file-upload" type="file" accept="image/*" onchange="readFile(this)">
         <p></p>
-        <button class="btn btn-primary" onclick="readFile(document.getElementById('file-upload'))">確定</button>
         <p id="text-1">請選擇已經套色成紅色的圖片</p>
         <img style="max-width: 200px;max-height: 200px;" id="img-1">
         <img style="max-width: 200px;max-height: 200px;" id="img-2">
-
         <hr>
+        <p>修正圖片<br>請塗掉多餘的部分</p>
         <canvas id="canvas" width="900" height="900"
             style="width:900px;height:900px;border:solid 1px #000">error</canvas>
+
+        <button class="btn btn-primary">繼續</button>
     </div>
-    <input type="color" name="" id="">
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"
         integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw=="
@@ -42,6 +43,51 @@
 
     <script>
         const _Canvas = new fabric.Canvas('canvas');
+
+        function calc() {
+            const img = new Image()
+            img.src = _Canvas.toDataURL()
+
+
+            img.onload = function () {
+
+
+                var canvas = document.createElement('canvas')
+                canvas.width = img.width
+                canvas.height = img.height
+                var ctx = canvas.getContext("2d")
+                ctx.drawImage(img, 0, 0)
+
+                var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+                var pixels = imgData.data
+
+                var area = 0
+
+                for (i = 0; i < pixels.length; i += 4) {
+                    const R = pixels[i]
+                    const G = pixels[i + 1]
+                    const B = pixels[i + 2]
+                    const A = pixels[i + 3]
+
+                    if (R == 255 && G == 0 && B == 0) {
+                        area++
+                        $("#text-1").text(`目前重疊面積： ${area}像素 〔計算中〕`)
+                        pixels[i] = 255
+                        pixels[i + 1] = 255
+                        pixels[i + 2] = 0
+                        pixels[i + 3] = 0
+
+                    }
+                }
+                ctx.putImageData(imgData, 0, 0)
+                $("#text-1").text(`最終重疊面積： ${area}像素`)
+                $("#img-2").attr("src", canvas.toDataURL())
+
+            }
+
+        }
+
+
         function readFile(e) {
             console.log(e)
             if (!e.files.length) {
@@ -52,41 +98,7 @@
                     const displayImg = document.getElementById("img-1")
                     img.src = URL.createObjectURL(e.files[i]);
                     displayImg.src = URL.createObjectURL(e.files[i])
-                    img.onload = function () {
 
-
-                        var canvas = document.createElement('canvas')
-                        canvas.width = img.width
-                        canvas.height = img.height
-                        var ctx = canvas.getContext("2d")
-                        ctx.drawImage(img, 0, 0)
-
-                        var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-                        var pixels = imgData.data
-
-                        var area = 0
-
-                        for (i = 0; i < pixels.length; i += 4) {
-                            const R = pixels[i]
-                            const G = pixels[i + 1]
-                            const B = pixels[i + 2]
-                            const A = pixels[i + 3]
-
-                            if (R == 255 && G == 0 && B == 0) {
-                                area++
-                                $("#text-1").text(`目前重疊面積： ${area}像素 〔計算中〕`)
-                                pixels[i] = 255
-                                pixels[i+1] = 255
-                                pixels[i+2]= 0
-                                pixels[i+3] = 0
-
-                            }
-                        }
-                        ctx.putImageData(imgData, 0, 0)
-                        $("#text-1").text(`最終重疊面積： ${area}像素`)
-                        $("#img-2").attr("src",canvas.toDataURL())
-
-                    }
                     displayImg.onload = function () {
                         const image = new fabric.Image(displayImg, {
                             top: 0, left: 0
