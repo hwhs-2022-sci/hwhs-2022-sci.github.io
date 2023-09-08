@@ -105,7 +105,7 @@
                     displayImg.src = URL.createObjectURL(e.files[i])
 
                     displayImg.onload = function () {
-                        $("#text-2").text(`原始圖片大小：${img.width}*${img.height}`)
+                        $("#text-2").text(`原始圖片大小：${displayImg.offsetWidth}*${displayImg.offsetHeight}`)
 
                         const image = new fabric.Image(displayImg, {
                             top: 0, left: 0
