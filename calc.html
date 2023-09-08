@@ -103,9 +103,10 @@
                     const displayImg = document.getElementById("img-1")
                     img.src = URL.createObjectURL(e.files[i]);
                     displayImg.src = URL.createObjectURL(e.files[i])
-                    $("#text-2").text(`原始圖片大小：${img.width}*${img.height}`)
 
                     displayImg.onload = function () {
+                        $("#text-2").text(`原始圖片大小：${img.width}*${img.height}`)
+
                         const image = new fabric.Image(displayImg, {
                             top: 0, left: 0
                         })
