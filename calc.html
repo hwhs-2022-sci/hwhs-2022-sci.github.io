@@ -20,6 +20,7 @@
         <input id="file-upload" type="file" accept="image/*" onchange="readFile(this)">
         <p></p>
         <h4 id="text-1">請選擇已經套色成紅色的圖片</h4>
+        <h4 id="text-2"></h4>
         <img style="max-width: 200px;max-height: 200px;" id="img-1">
         <img style="max-width: 200px;max-height: 200px;" id="img-2">
         <hr>
@@ -86,7 +87,7 @@
                     }
                 }
                 ctx.putImageData(imgData, 0, 0)
-                $("#text-1").text(`最終重疊面積： ${area}像素 ，圖片大小： ${allpixels}像素`)
+                $("#text-1").text(`最終重疊面積： ${area}像素`)
                 $("#img-2").attr("src", canvas.toDataURL())
 
             }
@@ -102,6 +103,7 @@
                     const displayImg = document.getElementById("img-1")
                     img.src = URL.createObjectURL(e.files[i]);
                     displayImg.src = URL.createObjectURL(e.files[i])
+                    $("#text-2").text(`原始圖片大小：${img.width}*${img.height}`)
 
                     displayImg.onload = function () {
                         const image = new fabric.Image(displayImg, {
