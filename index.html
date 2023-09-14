@@ -452,6 +452,7 @@
                         data-bs-parent="#accordionExample">
                         <div class="accordion-body">
                             <p>此處數據僅供參考<br>詳細數據請參考導出的csv檔案</p>
+                            <p>目前重疊面積： <span id="text-1">---</span>像素</p>
                             <table class="table">
                                 <thead>
                                     <tr>
@@ -467,6 +468,7 @@
 
                                 </tbody>
                             </table>
+
                         </div>
                     </div>
                 </div>
@@ -1034,7 +1036,7 @@
 
 
         var layerCount = 0, record = [];
-        function Canvas(type, par) {
+       async function Canvas(type, par) {
 
             if (type == 'addLayer') {
                 layerCount++
@@ -1150,6 +1152,8 @@
                     </tr>
                    `)
                 }
+                $("#text-1").text("正在計算重疊面積...")
+                await calc()
             } else if (type == "export") {
                 Data("add")
             }
@@ -1852,6 +1856,43 @@
                 $('#fullscreen').hide(); $('body').css('overflow-y', 'scroll')
             }
         })
+
+       async function calc() {
+            const img = new Image()
+            img.src = _Canvas.toDataURL()
+
+            img.onload = function () {
+                var canvas = document.createElement('canvas')
+                canvas.width = img.width
+                canvas.height = img.height
+                var ctx = canvas.getContext("2d")
+                ctx.drawImage(img, 0, 0)
+
+                var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+                var pixels = imgData.data
+
+                var area = 0,allpixels = 0
+
+                for (i = 0; i < pixels.length; i += 4) {
+                    const R = pixels[i]
+                    const G = pixels[i + 1]
+                    const B = pixels[i + 2]
+                    const A = pixels[i + 3]
+                    allpixels++
+
+                    if (R == 255 && G == 0 && B == 0) {
+                        area++
+                        $("#text-1").text(`目前重疊面積： ${area}像素 〔計算中〕`)
+
+                    }
+                }
+        
+                $("#text-1").text(`最終重疊面積： ${area}像素`)
+                return area
+
+            }
+        }
+
 
     </script>
 </body>
