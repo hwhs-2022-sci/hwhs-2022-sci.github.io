@@ -452,7 +452,7 @@
                         data-bs-parent="#accordionExample">
                         <div class="accordion-body">
                             <p>此處數據僅供參考<br>詳細數據請參考導出的csv檔案</p>
-                            <p>目前重疊面積： <span id="text-1">---</span>像素</p>
+                            <p>目前重疊面積： <span id="text-1">---</span></p>
                             <table class="table">
                                 <thead>
                                     <tr>
@@ -1882,12 +1882,11 @@
 
                     if (R == 255 && G == 0 && B == 0) {
                         area++
-                        $("#text-1").text(`目前重疊面積： ${area}像素 〔計算中〕`)
 
                     }
                 }
         
-                $("#text-1").text(`最終重疊面積： ${area}像素`)
+                $("#text-1").text(`${area}像素`)
                 return area
 
             }
