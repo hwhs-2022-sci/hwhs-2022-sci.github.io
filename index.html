@@ -439,7 +439,13 @@
                     <label class="form-check-label" for="flexSwitchCheckDefault">鎖定移動</label>
                 </div>-->
             </div>
-            <br>
+            <p>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"
+                    onchange="_Canvas.isDrawingMode = this.checked">
+                    <label class="form-check-label" for="flexSwitchCheckDefault">繪圖模式</label>
+                  </div>
+            </p>
             <div class="accordion" id="accordionExample">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingOne">
@@ -1463,6 +1469,10 @@
             a.click()
         }
         const _Canvas = new fabric.Canvas('canvas');
+        _Canvas.isDrawingMode = false
+        _Canvas.freeDrawingBrush.width = 50;
+        _Canvas.freeDrawingBrush.color = '#000';
+
         async function drawImg(data, alpha) {//arr
             var canvas = document.getElementById('canvas'),
                 ctx = canvas.getContext('2d');//origional canvas
