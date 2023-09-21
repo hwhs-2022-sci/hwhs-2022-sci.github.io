@@ -636,27 +636,7 @@
                     //console.log(input.files[i])
                     imgCount++; activeImg++;
                     var theFileName = input.files[i].name
-                    if (!theFileName.includes("北極") && !theFileName.includes("南極")) {//沒法判斷是否為科展圖片
-                        $("#data-display").append(`
-<div class="data-item" id="data-${imgCount}">
-<div class="d-flex">
-    <div class="data-image" id="img-container-${imgCount}">
-    <div class='img-err-alt'><i class="bi bi-x-circle text-danger" style='font-size:2.5em'></i><h6 class='text-danger'>資料讀取失敗</h6></div></div>    <div style="padding: 5px;">
-        <div class="btn-group" role="group" aria-label="toolbar">
-            <button disabled type="button" disabled class="btn btn-primary" id='download-${imgCount}' onclick="Img('dl',{'id':'img-${imgCount}','num':${imgCount}})">
-                <i class="bi bi-download"></i>
-            </button>
-            <button type="button" class="btn btn-danger" onclick="Img('del',{'id':'data-${imgCount}','num':${imgCount}})">
-                <i class="bi bi-trash"></i>
-            </button>
-        </div>
-        <br>
-        <span data-from="" id="data-from-${imgCount}">上傳的檔案</span>
-        <br>
-        <span id="data-filename-${imgCount}" data-filename="${theFileName}"><s class="text-danger">${theFileName}</s><br/><span class="text-danger">檔案名稱無效</span></span>
-        <br>
-        <span class='text-secondary'>圖片 #${imgCount}</span></div></div></div>`)
-                    } else {
+    
 
                         $("#data-display").append(`
 <div class="data-item" id="data-${imgCount}">
@@ -690,7 +670,7 @@
                             //  URL.revokeObjectURL(img.src);
                             await Img('loaded', { 'id': img.id, 'num': img.id.split("-")[1] })
                         };
-                    }
+                    
 
                     //li.appendChild(img);
 
