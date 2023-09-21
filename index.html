@@ -1129,7 +1129,7 @@
                 for (i = 0; i < objs.length; i++) {
                     $("#data-table").append(`
                     <tr>
-                    <td>${objs[i].name}</td>
+                    <td>${objs[i].name?objs[i].name:"畫筆圖層"}</td>
                     <td>(${objs[i].oCoords.tl.x.toFixed(2)},${objs[i].oCoords.tl.y.toFixed(2)})</td>
                     <td>(${objs[i].oCoords.tr.x.toFixed(2)},${objs[i].oCoords.tr.y.toFixed(2)})</td>
                     <td>(${objs[i].oCoords.bl.x.toFixed(2)},${objs[i].oCoords.bl.y.toFixed(2)})</td>
