@@ -19,13 +19,13 @@
     <div>
         <input id="file-upload" type="file" accept="image/*" onchange="readFile(this)">
         <p></p>
-        <h4 id="text-1">請選擇已經套色成紅色的圖片</h4>
-        <h4 id="text-2">開始計算前，建議先修正圖片</h4>
+        <h4 id="text-2" style="background-color: blue; color:#fff;padding: 10px;">檔案名稱</h4>
+        <h4 id="text-1" style="background-color: yellow;padding: 10px;">重疊面積</h4>
         <img style="max-width: 200px;max-height: 200px;" id="img-1">
         <img style="max-width: 200px;max-height: 200px;" id="img-2">
         <hr>
         <button class="btn btn-primary" onclick="calc()">開始計算面積</button>
-<p></p>
+        <p></p>
         <p>修正圖片<br>請塗掉多餘的部分</p>
         <canvas id="canvas" width="900" height="900"
             style="width:900px;height:900px;border:solid 1px #000">error</canvas>
@@ -44,11 +44,11 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
-        const _Canvas = new fabric.Canvas('canvas',{
-            isDrawingMode:true,
-            freeDrawingBrush:{
-                width:200,
-                color:"#000"
+        const _Canvas = new fabric.Canvas('canvas', {
+            isDrawingMode: true,
+            freeDrawingBrush: {
+                width: 200,
+                color: "#000"
             }
         });
         _Canvas.freeDrawingBrush.width = 100 //單獨拉出來定義，不然fabric.js抓不到
@@ -67,7 +67,7 @@
                 var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
                 var pixels = imgData.data
 
-                var area = 0,allpixels = 0
+                var area = 0, allpixels = 0
 
                 for (i = 0; i < pixels.length; i += 4) {
                     const R = pixels[i]
@@ -87,7 +87,7 @@
                     }
                 }
                 ctx.putImageData(imgData, 0, 0)
-                $("#text-1").text(`最終重疊面積： ${area}像素`)
+                $("#text-1").html(`最終重疊面積： <code>${area}</code> 像素`)
                 $("#img-2").attr("src", canvas.toDataURL())
 
             }
@@ -99,13 +99,15 @@
                 alert("請選擇檔案")
             } else {
                 for (let i = 0; i < e.files.length; i++) {
+                    console.log(e.files[i])
+
                     const img = new Image()
                     const displayImg = document.getElementById("img-1")
                     img.src = URL.createObjectURL(e.files[i]);
                     displayImg.src = URL.createObjectURL(e.files[i])
 
                     displayImg.onload = function () {
-                        $("#text-2").text(`原始圖片大小：${displayImg.naturalWidth}*${displayImg.naturalHeight}`)
+                        $("#text-2").text(`${e.files[i].name} (${displayImg.naturalWidth}*${displayImg.naturalHeight})`)
 
                         const image = new fabric.Image(displayImg, {
                             top: 0, left: 0
