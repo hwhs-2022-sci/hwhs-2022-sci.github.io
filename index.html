@@ -938,7 +938,7 @@
                 }
 
                 if (document.getElementById("img-setting-switch-2").checked) {
-                    var theFileName = $("#data-filename-" + par.num).attr("data-filename").split(".")[0].replace(" ","_").replace(":","_") + "--標記"
+                    var theFileName = $("#data-filename-" + par.num).attr("data-filename").split(".")[0].replace(" ","_").replace(":","_)") + "--標記"
 
                     var theCanvas = document.createElement("canvas"),
                         theCtx = theCanvas.getContext("2d")
@@ -965,16 +965,20 @@
                     }
                     theCtx.fillStyle = 'white'
                     theCtx.fill()
-                    console.log("yrfyudryikcbit")
+                    
                     theCtx.strokeStyle = "yellow"
                     if (theFileName.includes("南極")) {
-                        theCtx.moveTo(230,440)
-                        theCtx.lineTo(400,400)
+                        theCtx.moveTo(0,440)
+                        theCtx.lineTo(400,800)
                     }else if(theFileName.includes("北極")){
-                        theCtx.moveTo(380,330)
-                        theCtx.lineTo(400,330)
+                        theCtx.moveTo(0,330)
+                        theCtx.lineTo(400,800)
                     }
                     theCtx.stroke()
+
+                    if(theFileName.split("_")[1] == "12"){
+
+                    }
 
 
                     theCtx.closePath()
