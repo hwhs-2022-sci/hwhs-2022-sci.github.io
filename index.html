@@ -937,7 +937,7 @@
 
                 }
 
-                if (document.getElementById("img-setting-switch-2").checked && !$("#data-filename-" + par.num).attr("data-filename").split(".")[0].includes("--")) {
+                if (document.getElementById("img-setting-switch-2").checked) {
                     var theFileName = $("#data-filename-" + par.num).attr("data-filename").split(".")[0] + "--標記"
 
                     var theCanvas = document.createElement("canvas"),
@@ -965,6 +965,11 @@
                     }
                     theCtx.fillStyle = 'white'
                     theCtx.fill()
+
+
+                    if (theFileName.includes("南極")) {}
+
+
                     theCtx.closePath()
 
                     var img = theCanvas.toDataURL()
