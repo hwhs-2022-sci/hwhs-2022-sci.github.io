@@ -38,7 +38,8 @@
         <img style="max-width: 200px;max-height: 200px;" id="img-2">
         <hr>
         <button class="btn btn-primary m-1" onclick="calc()">開始計算面積</button>
-        <button class="btn btn-danger m-1" onclick="clearall()">清除</button>
+        <button hidden
+         class="btn btn-danger m-1" onclick="clearall()">清除</button>
         <p></p>
         <p>修正圖片<br>請塗掉多餘的部分</p>
         <canvas id="canvas" width="900" height="900"
@@ -68,17 +69,17 @@
         _Canvas.freeDrawingBrush.width = 100 //單獨拉出來定義，不然fabric.js抓不到
 
 
-        function clearall(){
-                            let objs = _Canvas.getObjects()
-                    objs.forEachObject(function (obj) {
-                            _Canvas.remove(obj);
+        function clearall() {
+            let objs = _Canvas.getObjects()
+            objs.forEachObject(function (obj) {
+                _Canvas.remove(obj);
 
 
-                    });
-                }
+            });
+        }
 
 
-        
+
 
 
 
